@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { PostSignUp } = require("../controllers/auth-controller")
+const { PostSignUp,postLogin } = require("../controllers/auth-controller")
 const authErrorHandler=require("../controllers/error-handlers/auth-error-handler")
 
 
@@ -8,7 +8,7 @@ const authErrorHandler=require("../controllers/error-handlers/auth-error-handler
 
 // routes
 router.post("/signup", PostSignUp)
-router.post("/login",)
+router.post("/login",postLogin)
 
 
 
