@@ -1,10 +1,11 @@
 const mongoose = require("mongoose")
-const mongodb=require("mongodb")
+const ObjectId=mongoose.Schema.Types.ObjectId
 
 // schemas
 const reviewSchema = new mongoose.Schema({
-    userId: mongodb.ObjectId,
-    content:String
+    userId: ObjectId,
+    content: String,
+    rating:Number
 })
 
 
@@ -24,24 +25,29 @@ const productSchema = new mongoose.Schema({
         required:true
     },
     discount: {
-        applicable: Boolean,
-        percentage: Number
+        type: Number,
+        default:0
     },
     inStock: {
         type: Number,
         required:true
     },
-    reviews: [reviewSchema],
-    images: [String],
-    category:{categoryId: {
-        type: mongodb.ObjectId,
-        index: true,
+    reviews: {
+        reviews: [reviewSchema],
+        rating: Number,
     },
-    categoryName: String},
+    images: [String],
+    category: {
+        categoryId: {
+            type: ObjectId,
+            index: true,
+    },
+        categoryName: String
+    },
     brand: {
         brandName: String,
         brandId: {
-            type: mongodb.ObjectId,
+            type: ObjectId,
             index: true
         }
     }
@@ -57,7 +63,7 @@ const productSchema = new mongoose.Schema({
 
 //the Model
 
-const Product = mongoose.model("user", productSchema)
+const Product = mongoose.model("product", productSchema)
 
 module.exports= Product
 

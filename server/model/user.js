@@ -1,7 +1,10 @@
 const mongoose = require("mongoose")
-const mongodb = require("mongodb")
+const ObjectId=mongoose.Schema.Types.ObjectId
 
 //schemas
+/* 
+-->next step in line is to add a verification prop --> verification through email
+*/
 const userSchema = new mongoose.Schema({
     name: {
         first: {
@@ -15,17 +18,47 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
+        index:{unique:true},
         required:true
     },
     password: {
         type: String,
         required:true
     },
-    isAdmin: {
-        type: Boolean,
-        default:false
+    role: {
+        type: String,
+        enum:["USER","ADMIN"],
+        default:"USER"
     },
-    suspended: {
-        type:boolean
-    }
+    status: {
+        type: String,
+        enum:["ACTIVE", "INACTIVE_ACOUNT","SUSPENDED"],
+        default:"ACTIVE"
+    },
+    orders: [{
+        orderId: {
+            type:ObjectId
+        }
+    }],
+    
 })
+
+
+
+
+
+//static methods
+
+
+
+//document methods
+
+
+
+// model
+
+const User = mongoose.model('user', userSchema)
+
+module.exports=User
+
+
