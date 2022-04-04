@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 		first: {
 			type: String,
 			required: [true, "enter first name"],
-			validate: [validator.default.isAlpha, "name must contain only letters"],
+			validate: [validator.default.isAlpha,{field :"FIRST_NAME",msg:"first name must only containes letters"}],
 		},
 		last: {
 			type: String,
@@ -77,7 +77,9 @@ userSchema.pre("save", async function (next) {
 //static methods
 
 //document methods
-
+userSchema.methods.checkPassword =async function (password) {
+	return await bcrypt.compare(password,this.password)
+}
 // model
 
 const User = mongoose.model("user", userSchema);

@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken")
-const bcrypt = require("bcryptjs")
 require("dotenv").config()
 
 const User = require("../model/user")
@@ -34,9 +33,10 @@ exports.postLogin = async(req, res) => {
     const user = await User.findOne({ email: email })
     
     try {
-        
-        //validate hashed  password
-        const validPassword= await bcrypt.compare(password,user.password)
+        if(!user)return res.status(404).json({error:"404",msg:"there is no such user"})
+
+
+        const validPassword= await user.checkPassword(password)
 
         //wrong password
         if (!validPassword) return res.status(403).json({ error: "403", msg: "user entered a wrong password" })

@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "email-validator": "^2.0.4",
     "express": "^4.17.3",

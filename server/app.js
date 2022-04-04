@@ -1,6 +1,9 @@
 const express = require("express")
 const path= require("path")
 const connectToDataBase = require("./utils/data-base")
+const authorizationMiddleware = require("./controllers/authorization-middleware")
+const checkIfAdmin=require("./middleware/error-handlers/admin-authorization")
+
 require("dotenv").config()
 
 const mongoConnectionUri = process.env.MONGO_CONNECTION
@@ -32,7 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //routes
 app.use("/auth",authRouter)
-app.use("/admin",adminRouter)
+app.use("/admin",authorizationMiddleware,checkIfAdmin,adminRouter)
 app.use("/user", userRouter)
 
 

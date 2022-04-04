@@ -10,17 +10,8 @@ const authorizationMiddleware=require("../controllers/authorization-middleware")
 so auhentication and authorization middleware mus be added */
 
 
-//checks for jwt 
-router.use(authorizationMiddleware)
 
-//checks for user role
 
-router.use((req, res, next) => {
-    const user = req.user
-    
-    if (user.role !== 'ADMIN') return res.status(403).json({ error: "403", msg: "user is not authorized to make such an action" })
-    next()
-})
 
 
 router.post("/add-product",addProduct)
