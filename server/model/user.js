@@ -34,16 +34,6 @@ const userSchema = new mongoose.Schema({
 			"this is not a strong password",
 		],
 	},
-	confirmPassword: {
-		type: String,
-		required: [true, "no password confirmation has been added"],
-		validate: [
-			function (conPassword) {
-				return conPassword === this.password;
-			},
-			"confirmed password is not the same as the password",
-		],
-	},
 	role: {
 		type: String,
 		enum: ["USER", "ADMIN"],

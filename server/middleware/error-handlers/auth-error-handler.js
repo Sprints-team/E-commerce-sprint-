@@ -13,13 +13,12 @@ const handleValidationError = (err, res) => {
     const { errors } = err
     const fields = Object.keys(errors)
     errors[fields[0]]
-    res.status(400).json(err)
-    // {field:errors[fields[0]].path,error:errors[fields[0]].message}
+    res.status(400).json({field:errors[fields[0]].path,error:errors[fields[0]].message})
 }
 
-// middleware for handling any error rom the auth route 
-const authErrorHandler = (err,req,res,next) => {
-    console.log(err)
+// middleware for handling any error from the auth route 
+const authErrorHandler = (err, req, res, next) => {
+    
     try {
         if (err.name === "ValidationError") return handleValidationError(err, res)
         if (err.code && err.code === 11000) return handleEmailDublicationError(err, res)

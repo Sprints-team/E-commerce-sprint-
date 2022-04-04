@@ -34,7 +34,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 //routes
-app.use("/auth",authRouter)
+app.use("/auth", authRouter)
+
 app.use("/admin",authorizationMiddleware,checkIfAdmin,adminRouter)
 app.use("/user", userRouter)
 

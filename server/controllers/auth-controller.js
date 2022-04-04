@@ -15,7 +15,6 @@ exports.PostSignUp = async(req, res,next) => {
         name: name,
         email: email,
         password: password,
-        confirmPassword:confirmPassword
     })
     
     try {
