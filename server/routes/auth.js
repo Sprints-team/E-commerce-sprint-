@@ -17,7 +17,7 @@ router.post("/login",validator(loginCompiledSchema),postLogin)
 
 
 // error handling route must be at the bottom af all routes not to interrupt request
-router.use(authErrorHandler)
+// router.use(authErrorHandler)
 
 
 

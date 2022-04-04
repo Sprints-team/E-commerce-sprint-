@@ -8,21 +8,21 @@ const Product = require("../model/product");
     2-json web token 
 */
 exports.addProduct =async (req, res) => {
-    const { title, description, price, qty, images, category, brand } = req.body
-    console.log(req.body)
-    console.log(qty,"qty")
+    const { title, describtion, price, inStock, images, category, brand } = req.body
+
+    console.log(req.files,"files")
+
     const product = new Product({
         price:price,
         title: title,
-        description: description,
-        inStock:qty,
+        describtion: describtion,
+        inStock:inStock,
         images: images,
         category: category,
         brand:brand
     })
     const response=await product.save()
     try {
-        console.log(response)
         res.status(200).json({msg:"product has bean added succesfully"})
     } catch (err) {
         console.log(err)

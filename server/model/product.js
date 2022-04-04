@@ -18,18 +18,22 @@ const productSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required:true
+        required: true,
+        min:1
     },
-    description: {
+    describtion: {
         type: String,
         required:true
     },
     discount: {
         type: Number,
-        default:0
+        default: 0,
+        min: 0,
+        max:99
     },
     inStock: {
         type: Number,
+        min:1,  
         required:true
     },
     reviews: {

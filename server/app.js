@@ -2,7 +2,8 @@ const express = require("express")
 const path= require("path")
 const connectToDataBase = require("./utils/data-base")
 const authorizationMiddleware = require("./controllers/authorization-middleware")
-const checkIfAdmin=require("./middleware/error-handlers/admin-authorization")
+const checkIfAdmin = require("./middleware/error-handlers/admin-authorization")
+const authErrorHandler = require("./middleware/error-handlers/auth-error-handler")
 
 require("dotenv").config()
 
@@ -27,6 +28,7 @@ app.use(express.json({ type: "application/json" }));
 
 
 
+
 // static files
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -38,6 +40,7 @@ app.use("/auth", authRouter)
 
 app.use("/admin",authorizationMiddleware,checkIfAdmin,adminRouter)
 app.use("/user", userRouter)
+app.use(authErrorHandler)
 
 
 

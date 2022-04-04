@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const ObjectId=mongoose.Schema.Types.ObjectId
 
 
 // schemas
@@ -15,6 +14,10 @@ const brandSchema = new mongoose.Schema({
     manufacturer: {
         type: String,
         required:true
+    },
+    logo: {
+        type: "string",
+        required: true
     }
 })
 
