@@ -26,18 +26,62 @@ const objectIdCompiledSchema = require("../ejv/validator-schemas/ObjectIdSchema"
 // router
 
 // will accept form-data--> uses multer to upload the file and pass any text to the req.body
+// the text data will be sent in the form of json with a json key
 /* 
-    data:
-    title-->
-    describtion-->
-    price-->
-    inStock-->
-    category-name-->
-    gender-->
-    age-groub-->
-    size-->
-    colour-->
-    file-->
+    data-->
+	form data :{
+	files--> the uploaded files
+	json--> {
+    "title":"product1 ",
+    "describtion":"a very good product",
+    "price": 33.3,
+    "discount":0,
+    "gender":"MALE",
+    "ageGroup":"ADULT",
+    "stock":{
+        "sizes":[
+            {
+                "size":"S",
+                "colors":[{
+                    "hexColor":"#ffffff",
+                    "qty": 33
+                },{
+                    "hexColor":"#eeeeee",
+                    "qty": 33
+                },{
+                    "hexColor":"#000000",
+                    "qty": 33
+                }]
+            }, {
+                "size":"M",
+                "colors":[{
+                    "hexColor":"#ffffff",
+                    "qty": 33
+                },{
+                    "hexColor":"#eeeeee",
+                    "qty": 33
+                },{
+                    "hexColor":"#000000",
+                    "qty": 33
+                }]
+            }, {
+                "size":"L",
+                "colors":[{
+                    "hexColor":"#ffffff",
+                    "qty": 33
+                },{
+                    "hexColor":"#eeeeee",
+                    "qty": 33
+                },{
+                    "hexColor":"#000000",
+                    "qty": 33
+                }]
+            }
+        ]
+    }
+}
+	}
+
 */
 // to send product data as form data would be hard
 
@@ -47,10 +91,16 @@ const objectIdCompiledSchema = require("../ejv/validator-schemas/ObjectIdSchema"
 //request to upload the images
 
 router.post(
-	"/add-product",
+	"/add-product", upload.array("files",5),
+	(req, res, next) => {
+		req.body = JSON.parse(req.body.json)
+		next()
+	},
 	validator(producCompiledSchema),
 	addProduct
 );
+
+
 router.post(
 	"/add-product/:id",
 	validator(objectIdCompiledSchema,true),

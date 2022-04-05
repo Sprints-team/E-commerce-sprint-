@@ -91,7 +91,7 @@ productSchema.statics.addImages =async function (id, imgArr) {
     console.log(product,"wwwwow")
     try {
         if (product) {
-            product.images = imgArr
+            product.images = [...product.images,...imgArr]
             await product.save()
         } else {
             throw new Error("no user with that id")
