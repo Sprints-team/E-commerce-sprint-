@@ -1,0 +1,61 @@
+@use "./global/mixins.module.scss";
+@use "./global/variables.module.scss";
+.container {
+  ul,
+  li {
+    @include mixins.resetList();
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 2rem;
+    transition: all ease 0.3s;
+  }
+  .logo {
+    font-size: 1.75rem;
+    &:hover {
+      color: variables.$primaryColor;
+    }
+  }
+
+  //! Nav links
+  li:nth-of-type(2) {
+    ul {
+      gap: 3rem;
+    }
+    ul li {
+      &:hover {
+        color: variables.$primaryColor;
+      }
+    }
+    display: none;
+    @media screen and (min-width: 768px) {
+      display: flex;
+    }
+  }
+  @include mixins.resetList();
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  height: 70px;
+
+  //! Icons
+  .burger,
+  .searchIcon,
+  .profileIcon,
+  .notificationIcon {
+    align-self: center;
+    background-color: #fff;
+    color: #000;
+    transition: all ease 0.3s;
+    &:hover {
+      color: variables.$primaryColor;
+    }
+  }
+
+  .burger {
+    @media screen and (min-width: 768px) {
+      display: none;
+    }
+  }
+}
