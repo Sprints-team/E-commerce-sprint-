@@ -8,6 +8,23 @@ const reviewSchema = new mongoose.Schema({
     rating:Number
 })
 
+const stockSchema = new mongoose.Schema({
+    sizes: [{
+        size: String,
+        colors: [{
+            hexColor: {
+                type: String,
+                required:true
+            },
+            qty: {
+                type: Number,
+                required: true,
+                min:0
+            }
+        }]
+    }]
+})
+
 
 
 
@@ -16,6 +33,16 @@ const productSchema = new mongoose.Schema({
         type: String,
         required:true
     },
+    gender: {
+        type: String,
+        enum:["MALE","FEMALE"],
+        required:true
+    },
+    ageGroup: {
+        type: String,
+        enum:["ADULT","CHILD"]
+    },
+    stock: stockSchema,
     price: {
         type: Number,
         required: true,
@@ -31,14 +58,12 @@ const productSchema = new mongoose.Schema({
         min: 0,
         max:99
     },
-    inStock: {
-        type: Number,
-        min:1,  
-        required:true
-    },
     reviews: {
         reviews: [reviewSchema],
-        rating: Number,
+        rating: {
+            type: Number,
+            default:0
+        },
     },
     images: [String],
     category: {
@@ -61,6 +86,8 @@ const productSchema = new mongoose.Schema({
 
 // static methods
 
+
+// doc method
 
 
 

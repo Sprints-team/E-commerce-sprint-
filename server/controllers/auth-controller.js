@@ -42,7 +42,8 @@ exports.postLogin = async(req, res) => {
 
         const token = jwt.sign({ userName: user.name, role: user.role, email: user.email }, secret)
         res.status(200).json({
-            jsonToken: token, user: {
+            jsonToken: token,
+            user: {
                 email: user.email,
                 name: user.name
                 // -->we can add a user image url
