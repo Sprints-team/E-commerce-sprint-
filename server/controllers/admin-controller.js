@@ -42,3 +42,23 @@ exports.addProduct = async (req, res) => {
 		res.status(400).json({ error: "not a correct product data" });
 	}
 };
+
+
+
+exports.addImageToProduct =async (req,res,next) => {
+    const images = req.files.map(ele => {
+        return `uploudes/${ele.filename}`
+    })
+    const id = req.params.id
+    const err=await Product.addImages(id,images,res)
+    try {
+        if (err) {
+            console.log(err.message)
+            return res.status(404).json({msg:err.message})
+        }
+        return res.status(200).json({msg:"image Addded successfully"})
+    } catch (err){
+        console.log(err)
+        return res.status(404).json({error:"404",msg: err})
+    }
+}

@@ -86,6 +86,21 @@ const productSchema = new mongoose.Schema({
 
 // static methods
 
+productSchema.statics.addImages =async function (id, imgArr) {
+    const product = await this.findOne({ _id: id })
+    console.log(product,"wwwwow")
+    try {
+        if (product) {
+            product.images = imgArr
+            await product.save()
+        } else {
+            throw new Error("no user with that id")
+        }
+    } catch (err){
+        return(err)
+    }
+}
+
 
 // doc method
 

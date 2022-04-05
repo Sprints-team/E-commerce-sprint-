@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { addProduct } = require("../controllers/admin-controller");
+const { addProduct,addImageToProduct} = require("../controllers/admin-controller");
 
 
 const multer = require("multer");
@@ -56,13 +56,7 @@ router.post(
 	validator(objectIdCompiledSchema,true),
 	upload.array("files"),
 	fileExtensionValidator,
-	async (req, res, next) => {
-		// console.log(req.files);
-		// console.log(req.params.id);
-		const x = await JSON.parse(req.body.ha)
-		console.log(x)
-		res.end();
-	}
+	addImageToProduct
 );
 
 module.exports = router;
