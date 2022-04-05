@@ -1,7 +1,7 @@
 import { Search } from "tabler-icons-react";
 import { User } from "tabler-icons-react";
 import { Bell } from "tabler-icons-react";
-import { ThemeIcon, Burger } from "@mantine/core";
+import { ThemeIcon, Burger, Drawer } from "@mantine/core";
 import { useState } from "react";
 
 import classes from "../styles/Navbar.module.scss";
@@ -12,8 +12,30 @@ const Navbar = () => {
   return (
     <ul className={classes.container}>
       <li className={classes.logo}>Sprints</li>
-      <li>
-        <ul className={classes.nav}>
+      <Drawer
+        styles={{
+          title: { fontSize: "2rem" },
+          closeButton: { backgroundColor: "#eee" },
+        }}
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="ALL"
+        padding="xl"
+        size="xl"
+        transitionDuration={300}
+        transitionTimingFunction="ease"
+        transition="slide-right"
+      >
+        <ul className={classes.drawerLinks}>
+          <li>Home</li>
+          <li>Shop</li>
+          <li>Pages</li>
+          <li>Contact</li>
+          <li>LookBook</li>
+        </ul>
+      </Drawer>
+      <li className={classes.nav}>
+        <ul>
           <li>Home</li>
           <li>Shop</li>
           <li>Pages</li>

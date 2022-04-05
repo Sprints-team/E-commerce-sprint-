@@ -1,24 +1,34 @@
 @use "./global/mixins.module.scss";
 @use "./global/variables.module.scss";
 .container {
+  @include mixins.resetList();
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  height: 70px;
+
   ul,
   li {
     @include mixins.resetList();
     display: flex;
     justify-content: space-between;
+    align-self: center;
     cursor: pointer;
     gap: 2rem;
     transition: all ease 0.3s;
   }
+
+  //! Logo
   .logo {
     font-size: 1.75rem;
+    padding-bottom: 0.2em;
     &:hover {
       color: variables.$primaryColor;
     }
   }
 
   //! Nav links
-  li:nth-of-type(2) {
+  .nav {
     ul {
       gap: 3rem;
     }
@@ -32,30 +42,45 @@
       display: flex;
     }
   }
-  @include mixins.resetList();
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  height: 70px;
 
   //! Icons
-  .burger,
-  .searchIcon,
-  .profileIcon,
-  .notificationIcon {
-    align-self: center;
-    background-color: #fff;
-    color: #000;
-    transition: all ease 0.3s;
-    &:hover {
-      color: variables.$primaryColor;
+  .icons {
+    .burger,
+    .searchIcon,
+    .profileIcon,
+    .notificationIcon {
+      background-color: #fff;
+      color: #000;
+      // transition: all ease 0.3s;
+      &:hover {
+        color: variables.$primaryColor;
+      }
+    }
+    @media screen and (max-width: 768px) {
+      gap: 1rem;
     }
   }
 
   .burger {
     @media screen and (min-width: 768px) {
       display: none;
+    }
+  }
+}
+
+.drawerLinks {
+  @include mixins.resetList();
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  li {
+    padding: 1em 2em;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all ease 0.3s;
+    &:hover {
+      color: variables.$primaryColor;
     }
   }
 }
