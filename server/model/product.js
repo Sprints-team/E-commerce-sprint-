@@ -88,7 +88,6 @@ const productSchema = new mongoose.Schema({
 
 productSchema.statics.addImages =async function (id, imgArr) {
     const product = await this.findOne({ _id: id })
-    console.log(product,"wwwwow")
     try {
         if (product) {
             product.images = [...product.images,...imgArr]

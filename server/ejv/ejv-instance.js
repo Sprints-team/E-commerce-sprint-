@@ -37,12 +37,6 @@ ajvInstance.addFormat('alph-numeric', {
     validate:(string)=>alphNumericRgx.test(string)
 })
 
-ajvInstance.addFormat('confirmed-password', {
-    validate: function (confirmPassword) {
-        console.log(this.password)
-        return this.password === confirmPassword
-    }
-})
 
 ajvInstance.addFormat('universal-size', {
     validate:(string)=> checkIfUnvSize.test(string)
