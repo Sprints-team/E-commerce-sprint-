@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { addProduct,addImageToProduct} = require("../controllers/admin-controller");
-
+const {
+	addProduct,
+	addImageToProduct,
+	deleteProduct,
+} = require("../controllers/admin-controller");
 
 const multer = require("multer");
 const storage = multer.diskStorage({
@@ -18,7 +21,6 @@ const upload = multer({ storage: storage });
 // validator middlewares
 const validator = require("../middleware/validators/validator-middleware");
 const fileExtensionValidator = require("../middleware/validators/file-extension-validator");
-
 
 //ejv schemas
 const producCompiledSchema = require("../ejv/validator-schemas/product-schema");
@@ -91,22 +93,28 @@ const objectIdCompiledSchema = require("../ejv/validator-schemas/ObjectIdSchema"
 //request to upload the images
 
 router.post(
-	"/add-product", upload.array("files",5),
+	"/add-product",
+	upload.array("files", 5),
 	(req, res, next) => {
-		req.body = JSON.parse(req.body.json)
-		next()
+		req.body = JSON.parse(req.body.json);
+		next();
 	},
 	validator(producCompiledSchema),
 	addProduct
 );
 
-
 router.post(
 	"/add-product/:id",
-	validator(objectIdCompiledSchema,true),
+	validator(objectIdCompiledSchema, true),
 	upload.array("files"),
 	fileExtensionValidator,
 	addImageToProduct
+);
+
+router.post(
+	"/delete-product/:id",
+	validator(objectIdCompiledSchema, true),
+	deleteProduct
 );
 
 module.exports = router;

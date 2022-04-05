@@ -65,3 +65,18 @@ exports.addImageToProduct =async (req,res,next) => {
         return res.status(404).json({error:"404",msg: err})
     }
 }
+
+
+exports.deleteProduct = async(req, res, next) => {
+    const id = req.params.id
+    const record = await Product.deleteOne({ _id: id })
+    if (record.deletedCount === 0) {
+        return res.status(400).json({error:"400",msg:"there is no product wiht that id"})
+    }
+    try {
+        console.log(record)
+        return res.status(200).json({msg:"product deleted successfully"})
+    } catch (err) {
+        next(err,req,res,next)
+    }
+}
