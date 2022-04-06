@@ -5,13 +5,10 @@ const mongoose = require("mongoose")
 const brandSchema = new mongoose.Schema({
     title: {
 		type: String,
-		required:true,
+        required: true,
+        unique:true
     },
     describtion: {
-        type: String,
-        required:true
-    },
-    manufacturer: {
         type: String,
         required:true
     },
@@ -31,4 +28,7 @@ const brandSchema = new mongoose.Schema({
 
 
 // model 
-const Brand= mongoose.model('brand',brandSchema)
+const Brand = mongoose.model('brand', brandSchema)
+
+
+module.exports= Brand

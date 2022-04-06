@@ -2,9 +2,8 @@ const express = require("express");
 const router = express.Router();
 const {
 	addProduct,
-	addImageToProduct,
-    deleteProduct,
-    addCategory
+	psotHandlerCreator,
+    deleteHandlerCreator,
 } = require("../controllers/admin-controller");
 
 const multer = require("multer");
@@ -19,9 +18,12 @@ const storage = multer.diskStorage({
 	},
 });
 const upload = multer({ storage: storage });
+
+
 // validator middlewares
 const validator = require("../middleware/validators/validator-middleware");
 const fileExtensionValidator = require("../middleware/validators/file-extension-validator");
+
 // middlewares
 const parseJson = require("../middleware/parsing-middlewares/jsonParse");
 
@@ -29,6 +31,10 @@ const parseJson = require("../middleware/parsing-middlewares/jsonParse");
 const producCompiledSchema = require("../ajv/validator-schemas/product-schema");
 const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema");
 const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
+const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
+const Brand = require("../model/brands");
+const Category = require("../model/category");
+const Product = require("../model/product");
 // router
 
 // will accept form-data--> uses multer to upload the file and pass any text to the req.body
@@ -99,13 +105,54 @@ const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema
 // router.use(["/add-product","add-category"],upload)
 
 router.post(
-	"/add-product",
+	"/product",
 	upload.array("files", 5),
 	parseJson,
 	fileExtensionValidator,
 	validator(producCompiledSchema),
 	addProduct
 );
+
+
+// form data
+router.post(
+    "/category",
+    upload.single("image"),
+    fileExtensionValidator,
+    validator(categoryCompiledSchema),
+    psotHandlerCreator(Category, "imgUrl")
+);
+
+//form data
+router.post(
+    "/brand",
+    upload.single("image"),
+    fileExtensionValidator,
+    validator(brandCompiledSchema),
+    psotHandlerCreator(Brand, "logo")
+);
+
+
+router.delete(
+    "/product/:id",
+	validator(objectIdCompiledSchema, true),
+	deleteHandlerCreator(Product)
+    );
+    
+    router.delete(
+        "/category/:id",
+        validator(objectIdCompiledSchema, true),
+        deleteHandlerCreator(Category)
+        );
+
+        router.delete(
+            "/brand/:id",
+            validator(objectIdCompiledSchema, true),
+            deleteHandlerCreator(Brand)
+);
+
+
+module.exports = router;
 
 // router.post(
 // 	"/add-product/:id",
@@ -114,20 +161,3 @@ router.post(
 // 	fileExtensionValidator,
 // 	addImageToProduct
 // );
-
-router.post(
-	"/delete-product/:id",
-	validator(objectIdCompiledSchema, true),
-	deleteProduct
-);
-
-router.post(
-	"/addcategory",
-	upload.single("image"),
-	parseJson,
-	fileExtensionValidator,
-    validator(categoryCompiledSchema),
-    addCategory
-);
-
-module.exports = router;
