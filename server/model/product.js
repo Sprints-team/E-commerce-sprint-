@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
-const ObjectId=mongoose.Schema.Types.ObjectId
+const ObjectId = mongoose.Schema.Types.ObjectId
+const NotFound=require("../errors/not-found")
 
 // schemas
 const reviewSchema = new mongoose.Schema({
@@ -93,7 +94,7 @@ productSchema.statics.addImages =async function (id, imgArr) {
             product.images = [...product.images,...imgArr]
             await product.save()
         } else {
-            throw new Error("no user with that id")
+            throw new NotFound("no user with that id")
         }
     } catch (err){
         return(err)

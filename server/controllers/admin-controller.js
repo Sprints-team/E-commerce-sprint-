@@ -1,4 +1,6 @@
 const Product = require("../model/product");
+const BadRequest = require("../errors/bad-request");
+const Category = require("../model/category");
 
 /* data received:
     1-the new product data  
@@ -58,7 +60,8 @@ exports.addImageToProduct =async (req,res,next) => {
     const err=await Product.addImages(id,images,res)
     try {
         if (err) {
-            return res.status(404).json({msg:err.message})
+            return next(err,req,res,next)
+            // return res.status(404).json({msg:err.message})
         }
         return res.status(200).json({msg:"image Addded successfully"})
     } catch (err){
@@ -71,12 +74,34 @@ exports.deleteProduct = async(req, res, next) => {
     const id = req.params.id
     const record = await Product.deleteOne({ _id: id })
     if (record.deletedCount === 0) {
-        return res.status(400).json({error:"400",msg:"there is no product wiht that id"})
+        throw new BadRequest("there is no product wiht that id")
+        // return res.status(400).json({error:"400",msg:"there is no product wiht that id"})
     }
     try {
         console.log(record)
         return res.status(200).json({msg:"product deleted successfully"})
     } catch (err) {
+        next(err,req,res,next)
+    }
+}
+
+
+exports.addCategory = async (req,res,next) => {
+    const { title, describtion } = req.body
+
+    const imgUrl = `uploudes/${req.file.filename}`
+
+    const category = new Category({
+        title,describtion,imgUrl
+    }) 
+    
+    try {
+        await category.save()
+        return res.status(200).json("category added successfuly")
+    } catch (err) {
+        if (err.code&&err.code === 11000) {
+            return next (new BadRequest("there is a cateory with that title"),req,res,next)
+        }
         next(err,req,res,next)
     }
 }

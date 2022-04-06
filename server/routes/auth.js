@@ -1,10 +1,9 @@
 const express = require("express")
 const router = express.Router()
 const { PostSignUp,postLogin } = require("../controllers/auth-controller")
-const authErrorHandler = require("../middleware/validators/auth-error-handler")
 const validator = require("../middleware/validators/validator-middleware")
-const signupCompiledSchema= require("../ejv/validator-schemas/sign-up-schema")
-const loginCompiledSchema= require("../ejv/validator-schemas/login-schema")
+const signupCompiledSchema= require("../ajv/validator-schemas/sign-up-schema")
+const loginCompiledSchema= require("../ajv/validator-schemas/login-schema")
 const confirmPasswordChecker= require("../middleware/validators/confirmPasswordChecker")
 
 

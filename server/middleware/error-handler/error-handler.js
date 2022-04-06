@@ -2,6 +2,7 @@
 const handleEmailDublicationError = (err,res) => {
     const field=Object.keys(err.keyValue)
     const code = 409
+    console.log(err)
     
     res.status(code).json({field:field[0],msg: `an account with that ${field} already exist`})
 }
@@ -20,6 +21,7 @@ const handleValidationError = (err, res) => {
 const authErrorHandler = (err, req, res, next) => {
     
     try {
+        if(err.status===400) return res.status(err.status).json({error:400, msg:err.message})
         if (err.name === "ValidationError") return handleValidationError(err, res)
         if (err.code && err.code === 11000) return handleEmailDublicationError(err, res)
         // --> fields yet to be added 

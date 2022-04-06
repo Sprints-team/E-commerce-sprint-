@@ -6,12 +6,16 @@ const categorySchema = new mongoose.Schema({
 	title: {
 		type: String,
         required: true,
-        index:{unique:true}
+        index:{unique:[true,"this category is taken"]}
     },
     describtion: {
         type: String,
         required:true
     },
+    imgUrl: {
+        type: String,
+        required:true
+    }
 });
 
 

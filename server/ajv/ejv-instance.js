@@ -10,7 +10,7 @@ const checkForObjectId = new RegExp(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i)
 const checkIfStrOfInt = new RegExp('^[0-9]*$')
 const checkIfStrOfFlt = new RegExp('[+-]?([0-9]*[.])?[0-9]+')
 const checkIfUnvSize = new RegExp('^(\d*(?:M|X{0,2}[SL]))(?:$|\s+.*$)')
-const checkIfhexColor=  new RegExp("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+const checkIfhexColor = new RegExp("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 
 
 ajvInstance.addFormat('strong-password', {
@@ -45,6 +45,7 @@ ajvInstance.addFormat('universal-size', {
 ajvInstance.addFormat('hex-decimal-color', {
     validate:(string)=> checkIfhexColor.test(string)
 })
+
 
 
 

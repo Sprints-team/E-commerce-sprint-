@@ -3,7 +3,8 @@ const router = express.Router();
 const {
 	addProduct,
 	addImageToProduct,
-	deleteProduct,
+    deleteProduct,
+    addCategory
 } = require("../controllers/admin-controller");
 
 const multer = require("multer");
@@ -21,10 +22,13 @@ const upload = multer({ storage: storage });
 // validator middlewares
 const validator = require("../middleware/validators/validator-middleware");
 const fileExtensionValidator = require("../middleware/validators/file-extension-validator");
+// middlewares
+const parseJson = require("../middleware/parsing-middlewares/jsonParse");
 
 //ejv schemas
-const producCompiledSchema = require("../ejv/validator-schemas/product-schema");
-const objectIdCompiledSchema = require("../ejv/validator-schemas/ObjectIdSchema");
+const producCompiledSchema = require("../ajv/validator-schemas/product-schema");
+const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema");
+const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
 // router
 
 // will accept form-data--> uses multer to upload the file and pass any text to the req.body
@@ -92,29 +96,38 @@ const objectIdCompiledSchema = require("../ejv/validator-schemas/ObjectIdSchema"
 // product data as json-->sent firt the the user will get the prod id and make another
 //request to upload the images
 
+// router.use(["/add-product","add-category"],upload)
+
 router.post(
 	"/add-product",
 	upload.array("files", 5),
-	(req, res, next) => {
-		req.body = JSON.parse(req.body.json);
-		next();
-	},
+	parseJson,
+	fileExtensionValidator,
 	validator(producCompiledSchema),
 	addProduct
 );
 
-router.post(
-	"/add-product/:id",
-	validator(objectIdCompiledSchema, true),
-	upload.array("files"),
-	fileExtensionValidator,
-	addImageToProduct
-);
+// router.post(
+// 	"/add-product/:id",
+// 	validator(objectIdCompiledSchema, true),
+// 	upload.array("files"),
+// 	fileExtensionValidator,
+// 	addImageToProduct
+// );
 
 router.post(
 	"/delete-product/:id",
 	validator(objectIdCompiledSchema, true),
 	deleteProduct
+);
+
+router.post(
+	"/addcategory",
+	upload.single("image"),
+	parseJson,
+	fileExtensionValidator,
+    validator(categoryCompiledSchema),
+    addCategory
 );
 
 module.exports = router;
