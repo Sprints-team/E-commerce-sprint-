@@ -1,0 +1,44 @@
+$text:#2d343e;
+$roboto: 'Roboto';
+$cursive-font:'satisfy';
+$round:'Varela Round';
+$cta:#fe8033;
+$bg:#272b34;
+$light-bg:#2d343e;
+$text:#2d343e;
+$white:#fff;
+.dFlex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+  .dFlex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-content{
+    @extend .dFlex;
+    position: relative;
+    width: 70%;
+    height: 100%;
+flex-wrap: wrap;
+justify-content: space-between;
+box-sizing: border-box;
+margin:50px auto ;
+padding: 50px 0 0;
+
+  
+  h3{
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: $text;
+      
+  }
+    
+    
+}
+

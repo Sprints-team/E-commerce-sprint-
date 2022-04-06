@@ -1,0 +1,70 @@
+.dFlex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+$roboto: 'Roboto';
+$cursive-font:'satisfy';
+$round:'Varela Round';
+$cta:#fe8033;
+$bg:#272b34;
+$light-bg:#2d343e;
+$text:#2d343e;
+$white:#fff;
+.dFlex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card{
+
+    flex-direction: column;
+    border-radius: 15px;
+    position: relative;
+    transform: scale(.8);
+    transition: all .3s ease-in-out;
+    margin-bottom: 50px;
+    @extend .dFlex;
+    border: 1px solid $cta;
+    
+   
+    .card-img{
+        
+        margin-top: -5vw;
+    
+
+        img{
+           
+            width: 200px;
+           
+
+        }
+
+    }
+    .card-header{
+        @extend .dFlex;
+        flex-direction: column;
+        color:#ff9656 ;
+        margin: 25px 0;
+        h2{
+            font-size: 18px;
+        }
+        p{
+            font-size: 14px;
+            text-align: center;
+            margin: 8px 0;
+            color: rgba(#ff9656,.7);
+        }
+        .price{
+            font-size: 25px;
+            color: $cta;
+        }
+    }
+   
+}
+.card:hover{
+    background-color: #fefee2;
+    transform: scale(1.1);
+    cursor: pointer;
+}
