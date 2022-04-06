@@ -1,8 +1,8 @@
 const express = require("express");
 const path = require("path");
 const connectToDataBase = require("./utils/data-base");
-const authorizationMiddleware = require("./controllers/authorization-middleware");
-const checkIfAdmin = require("./middleware/validators/admin-authorization");
+const authorizationMiddleware = require("./middleware/auth/authorization-middleware");
+const checkIfAdmin = require("./middleware/auth/admin-authorization");
 const errorHandler = require("./middleware/error-handler/error-handler");
 
 require("dotenv").config();

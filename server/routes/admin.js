@@ -3,7 +3,7 @@ const router = express.Router();
 const {
 	addProduct,
 	psotHandlerCreator,
-    deleteHandlerCreator,
+	deleteHandlerCreator,
 } = require("../controllers/admin-controller");
 
 const multer = require("multer");
@@ -18,7 +18,6 @@ const storage = multer.diskStorage({
 	},
 });
 const upload = multer({ storage: storage });
-
 
 // validator middlewares
 const validator = require("../middleware/validators/validator-middleware");
@@ -113,42 +112,40 @@ router.post(
 	addProduct
 );
 
-
 // form data
 router.post(
-    "/category",
-    upload.single("image"),
-    fileExtensionValidator,
-    validator(categoryCompiledSchema),
-    psotHandlerCreator(Category, "imgUrl")
+	"/category",
+	upload.single("image"),
+	fileExtensionValidator,
+	validator(categoryCompiledSchema),
+	psotHandlerCreator(Category, "imgUrl")
 );
 
 //form data
 router.post(
-    "/brand",
-    upload.single("image"),
-    fileExtensionValidator,
-    validator(brandCompiledSchema),
-    psotHandlerCreator(Brand, "logo")
+	"/brand",
+	upload.single("image"),
+	fileExtensionValidator,
+	validator(brandCompiledSchema),
+	psotHandlerCreator(Brand, "logo")
 );
 
-
 router.delete(
-    "/product/:id",
+	"/product/:id",
 	validator(objectIdCompiledSchema, true),
 	deleteHandlerCreator(Product)
-    );
-    
-    router.delete(
-        "/category/:id",
-        validator(objectIdCompiledSchema, true),
-        deleteHandlerCreator(Category)
-        );
+);
 
-        router.delete(
-            "/brand/:id",
-            validator(objectIdCompiledSchema, true),
-            deleteHandlerCreator(Brand)
+router.delete(
+	"/category/:id",
+	validator(objectIdCompiledSchema, true),
+	deleteHandlerCreator(Category)
+);
+
+router.delete(
+	"/brand/:id",
+	validator(objectIdCompiledSchema, true),
+	deleteHandlerCreator(Brand)
 );
 
 
