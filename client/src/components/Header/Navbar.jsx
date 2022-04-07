@@ -4,7 +4,7 @@ import { Bell } from "tabler-icons-react";
 import { ThemeIcon, Burger, Drawer } from "@mantine/core";
 import { useState } from "react";
 
-import classes from "../styles/Navbar.module.scss";
+import classes from "../../styles/Header/Navbar.module.scss";
 
 const Navbar = () => {
   const [opened, setOpened] = useState(false);

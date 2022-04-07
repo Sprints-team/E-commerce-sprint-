@@ -1,5 +1,5 @@
-@use "./global/mixins.module.scss";
-@use "./global/variables.module.scss";
+@use "../global/mixins.module.scss";
+@use "../global/variables.module.scss";
 .container {
   @include mixins.resetList();
   display: flex;
