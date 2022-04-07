@@ -3,19 +3,9 @@
     justify-content: center;
     align-items: center;
 }
-$roboto: 'Roboto';
-$cursive-font:'satisfy';
-$round:'Varela Round';
-$cta:#fe8033;
-$bg:#272b34;
-$light-bg:#2d343e;
-$text:#2d343e;
-$white:#fff;
-.dFlex{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
+$primaryColor: #f55f4e;
+
 
 .card{
 
@@ -26,17 +16,19 @@ $white:#fff;
     transition: all .3s ease-in-out;
     margin-bottom: 50px;
     @extend .dFlex;
-    border: 1px solid $cta;
+    border: 1px solid $primaryColor;
+    
     
    
     .card-img{
         
         margin-top: -5vw;
+        
     
 
         img{
            
-            width: 200px;
+            width: 100%;
            
 
         }
@@ -45,7 +37,7 @@ $white:#fff;
     .card-header{
         @extend .dFlex;
         flex-direction: column;
-        color:#ff9656 ;
+        color:$primaryColor;
         margin: 25px 0;
         h2{
             font-size: 18px;
@@ -54,11 +46,12 @@ $white:#fff;
             font-size: 14px;
             text-align: center;
             margin: 8px 0;
-            color: rgba(#ff9656,.7);
+            color: rgba($primaryColor,.7);
         }
         .price{
             font-size: 25px;
-            color: $cta;
+            background-color: $primaryColor;
+            color: white;
         }
     }
    
@@ -67,4 +60,10 @@ $white:#fff;
     background-color: #fefee2;
     transform: scale(1.1);
     cursor: pointer;
+}
+@media (max-width:767px){
+    .card{
+        width: 100px;
+    }
+    
 }

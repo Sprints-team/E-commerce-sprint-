@@ -1,17 +1,5 @@
-$text:#2d343e;
-$roboto: 'Roboto';
-$cursive-font:'satisfy';
-$round:'Varela Round';
-$cta:#fe8033;
-$bg:#272b34;
-$light-bg:#2d343e;
-$text:#2d343e;
-$white:#fff;
-.dFlex{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+$primaryColor: #f55f4e;
+
 
   .dFlex{
     display: flex;
@@ -35,7 +23,7 @@ padding: 50px 0 0;
       position: absolute;
       left: 0;
       top: 0;
-      color: $text;
+      color: $primaryColor;
       
   }
     
