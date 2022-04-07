@@ -1,0 +1,58 @@
+[
+    {
+      "id":1,
+      "title":  "watch1",
+      "imageUrl":"/images/card1.png",
+    "desc":"this is product 1",
+    "price": 250,
+    "sizes":["S","M","L"]
+    },
+    {
+      "id":2,
+        "title":  "watch2",
+        "imageUrl":"/images/card2.png",
+      "desc":"this is product 2",
+      "price": 600,
+      "sizes":["S","M","L"]
+      },
+      {
+        "id":3,
+        "title":  "watch3",
+        "imageUrl":"/images/card11.png",
+      "desc":"this is product 3",
+      "price": 1000,
+      "sizes":["S","M"]
+      },
+      {
+        "id":4,
+        "title":  "watch4",
+        "imageUrl":"/images/card7.png",
+      "desc":"this is product 4",
+      "price": 450,
+      "sizes":["S","M"]
+      },
+      {
+        "id":5,
+        "title":  "watch4",
+        "imageUrl":"/images/card10.png",
+      "desc":"this is product 4",
+      "price": 450,
+      "sizes":["S","M"]
+      },
+      {
+        "id":6,
+          "title":  "watch2",
+          "imageUrl":"/images/card2.png",
+        "desc":"this is product 2",
+        "price": 600,
+        "sizes":["S","M","L"]
+        },
+        {
+          "id":7,
+          "title":  "watch3",
+          "imageUrl":"/images/card3.png",
+        "desc":"this is product 3",
+        "price": 1000,
+        "sizes":["S","M"]
+        }
+]
