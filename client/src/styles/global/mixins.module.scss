@@ -3,3 +3,13 @@
   margin: 0;
   list-style: none;
 }
+
+@mixin button {
+  font-size: clamp(0.4rem, 1.05vw, 1.15rem);
+  padding: 1em;
+  height: auto;
+}
+
+@mixin shadow-divider {
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -5px;
+}
