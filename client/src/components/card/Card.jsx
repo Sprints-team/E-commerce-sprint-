@@ -1,27 +1,23 @@
-import React from 'react'
-import './Card.scss'
+import React from "react";
+import classes from "../../styles/Card/Card.module.scss";
 
-const Card = ({product}) => {
+const Card = ({ product }) => {
   return (
     <div>
-        <div key={product.id} className='card'>
-        
-        <div className='card-img'>
-        
-        <img src={product.imageUrl} alt={product.title}/>
-        
+      <div key={product.id} className={classes.card}>
+        <div className={classes["card-img"]}>
+          <img src={product.imageUrl} alt={product.title} />
         </div>
-       
-        <div className='card-header'>
-            <h2>{product.title}</h2>
-            <p>{product.desc}</p>
 
-            <p className='price'>${product.price}</p>
-            </div>
-          
-    </div>
-    </div>
-  )
-}
+        <div className={classes["card-header"]}>
+          <h2>{product.title}</h2>
+          <p>{product.desc}</p>
 
-export default Card
+          <p className={classes["price"]}>${product.price}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Card;

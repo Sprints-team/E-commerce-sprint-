@@ -10,7 +10,7 @@ const Cover = () => {
           <h1>Fashion</h1>
           <h3>Look Your Best On Your Best Day</h3>
           <Button color="red" radius="md" size="xs">
-            Discover more
+            Discover More
           </Button>
         </div>
       </div>

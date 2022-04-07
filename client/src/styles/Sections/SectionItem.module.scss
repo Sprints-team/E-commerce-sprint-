@@ -1,0 +1,18 @@
+.container {
+  text-align: center;
+  margin-top: 4rem;
+  font-family: "Cairo";
+  h1 {
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-top: 0;
+  }
+  h2 {
+    text-transform: capitalize;
+    font-weight: 400;
+    word-spacing: 0.2em;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin-top: -0.5em;
+  }
+}

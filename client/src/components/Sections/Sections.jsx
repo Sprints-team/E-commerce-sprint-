@@ -57,20 +57,15 @@ const Sections = () => {
           Statics
         </Button>
       </nav>
-
-      <div style={{ height: "100vh" }} />
       <div ref={collectionRef}>
         <Collections />
       </div>
-      <div style={{ height: "100vh" }} />
       <div ref={newArravailRef}>
         <NewArrival />
       </div>
-      <div style={{ height: "100vh" }} />
       <div ref={cateogresRef}>
         <Cateogres />
       </div>
-      <div style={{ height: "100vh" }} />
       <div ref={staticsRef}>
         <Statics />
       </div>
