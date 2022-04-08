@@ -1,11 +1,12 @@
 import { Button } from "@mantine/core";
+import { useScrollIntoView } from "@mantine/hooks";
+
 import Collections from "./Collections";
 import NewArrival from "./NewArrival";
 import Cateogres from "./Cateogres";
 import Statics from "./Statics";
 
 import classes from "../../styles/Sections/Sections.module.scss";
-import { useScrollIntoView } from "@mantine/hooks";
 
 const Sections = () => {
   const { scrollIntoView: scrollIntoCollection, targetRef: collectionRef } =
