@@ -150,11 +150,3 @@ router.delete(
 
 
 module.exports = router;
-
-// router.post(
-// 	"/add-product/:id",
-// 	validator(objectIdCompiledSchema, true),
-// 	upload.array("files"),
-// 	fileExtensionValidator,
-// 	addImageToProduct
-// );

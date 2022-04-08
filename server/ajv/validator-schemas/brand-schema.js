@@ -3,6 +3,7 @@ const ajvInstance = require("../ejv-instance");
 
 const brandSchema = {
 	type: "object",
+	additionalProperties: false,
 	properties: {
 		title: {
 			type: "string",

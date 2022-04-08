@@ -1,8 +1,7 @@
 const express = require("express");
 const path = require("path");
 const connectToDataBase = require("./utils/data-base");
-const authorizationMiddleware = require("./middleware/auth/authorization-middleware");
-const checkIfAdmin = require("./middleware/auth/admin-authorization");
+const auth = require("./middleware/auth/auth");
 const errorHandler = require("./middleware/error-handler/error-handler");
 
 require("dotenv").config();
@@ -13,6 +12,7 @@ const port = process.env.PORT;
 const adminRouter = require("./routes/admin");
 const userRouter = require("./routes/user");
 const authRouter = require("./routes/auth");
+const sharedRouter=require("./routes/shared")
 
 const app = express();
 
@@ -25,8 +25,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //routes
 app.use("/auth", authRouter);
-app.use("/admin", authorizationMiddleware, checkIfAdmin, adminRouter);
+// auth.checkIfAdmin 
+app.use("/admin", auth.checkIfAdmin, adminRouter);
 app.use("/user", userRouter);
+app.use("/",sharedRouter)
 app.use(errorHandler);
 
 //initializing app and connecting to database

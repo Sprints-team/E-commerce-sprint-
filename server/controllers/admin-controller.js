@@ -24,7 +24,7 @@ const getModelName = (Model) => {
      */
     
     
-    exports.addProduct = async (req, res) => {
+    exports.addProduct = async (req, res,next) => {
         const {
             title,
 		describtion,
@@ -53,14 +53,14 @@ const getModelName = (Model) => {
 		brand: brand,
 		images,
 	});
-	const response = await product.save();
-	try {
+		// console.log(product,"product")
+		try {
+		const response = await product.save();
 		res
 			.status(200)
 			.json({ msg: "product has bean added succesfully", id: response._id });
 	} catch (err) {
-		console.log(err);
-		res.status(400).json({ error: "not a correct product data" });
+		next(err,req,res,next);
 	}
 };
 

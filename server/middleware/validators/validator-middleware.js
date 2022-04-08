@@ -1,5 +1,6 @@
 
-const validator = (ajvValidator,params=false,query=false) => {
+const validator = (ajvValidator, params = false, query = false) => {
+    
     return (req, res, next) => {
         if (params) {
                 const valid = ajvValidator(req.params.id)

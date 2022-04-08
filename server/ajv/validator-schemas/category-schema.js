@@ -3,6 +3,7 @@ const ajvInstance = require("../ejv-instance");
 
 const categorySchema = {
 	type: "object",
+	additionalProperties: false,
 	properties: {
 		title: {
 			type: "string",
@@ -11,9 +12,6 @@ const categorySchema = {
 		describtion: {
 			type: "string",
 			format: "alph-numeric",
-		},
-		imgUrl: {
-			type: "string",
 		},
 	},
 	required: ["title", "describtion"],

@@ -76,30 +76,12 @@ const productSchema = {
 			required: ["sizes"],
 		},
 		category: {
-			type: "object",
-			properties: {
-				categoryId: {
-					type: "string",
-					format: "objectId",
-				},
-				categoryName: {
-					type: "string",
-					format: "alph-numeric",
-				},
-			},
+			type: "string",
+			format:"objectId"
 		},
 		brand: {
-			type: "object",
-			properties: {
-				brandName: {
-					type: "string",
-					format: "objectId",
-				},
-				brandId: {
-					type: "string",
-					format: "alph-numeric",
-				},
-			},
+			type: "string",
+			format:"objectId"
 		},
 	},
 	required: ["title", "price", "stock", "describtion","gender","discount","ageGroup",]

@@ -2,29 +2,29 @@ const mongoose = require("mongoose")
 const ObjectId=mongoose.Schema.Types.ObjectId
 
 //schemas
-const productInOrderSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required:true
-    },
-    imageUrl: {
-        type: String,
-        required: true,
-    },
-    price: {
-        itemPrice: { type: Number, required: true },
-        qty: {type:Number, required:true}
-    },
-    totalPrice: {
-        type: Number,
-        required:true
-    },
-    productId: {
-        type:ObjectId,
-        required:true
-    }
+// const productInOrderSchema = new mongoose.Schema({
+//     title: {
+//         type: String,
+//         required:true
+//     },
+//     imageUrl: {
+//         type: String,
+//         required: true,
+//     },
+//     price: {
+//         itemPrice: { type: Number, required: true },
+//         qty: {type:Number, required:true}
+//     },
+//     totalPrice: {
+//         type: Number,
+//         required:true
+//     },
+//     productId: {
+//         type:ObjectId,
+//         required:true
+//     }
     
-},{_id:false})
+// },{_id:false})
 
 
 const orderSchema = new mongoose.Schema({
@@ -32,7 +32,14 @@ const orderSchema = new mongoose.Schema({
         type:ObjectId,
         required: true,
     },
-    products: [productInOrderSchema],
+    products: [{
+        product: {
+            type: ObjectId,
+            ref: "product" 
+        }, qty: {
+            type: Number,
+            min:1
+    }}],
     shippingAdress: {
         country: {
             type: String,
