@@ -1,5 +1,5 @@
-import classes from "../../styles/Sections/SectionItem.module.scss";
 import ProductsList from "../Productslist/ProductsList";
+import classes from "../../styles/Sections/SectionItem.module.scss";
 import data from "../../data.json";
 const Cateogres = () => {
   return (
