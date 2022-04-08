@@ -46,6 +46,15 @@ ajvInstance.addFormat('hex-decimal-color', {
     validate:(string)=> checkIfhexColor.test(string)
 })
 
+ajvInstance.addFormat("positive-number", {
+    validate:(input)=>input>=0
+})
+
+ajvInstance.addFormat("five-star-rating", {
+    validate:(input)=>input>=0&&input<=5
+})
+
+
 
 
 

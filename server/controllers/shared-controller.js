@@ -26,7 +26,7 @@ exports.getProduct = async (req, res, next) => {
 
 //?get all products data || get only the title,brice,id,discount, and images
 exports.getProducts = async (req, res, next) => {
-	const { title, brand, category, price, rating, sort, skip, limit } = req.body;
+	const { title, brand, category,gender,ageGroup, price, rating, sort, skip, limit } = req.body;
 
 	const pipeline = [
 		{ $limit: limit ? limit : 20 },
@@ -120,6 +120,16 @@ exports.getProducts = async (req, res, next) => {
 				category: new ObjectId(category),
 			},
 		});
+	if (gender) pipeline.unshift({
+		$match: {
+			gender:gender
+		}
+	})
+	if (ageGroup) pipeline.unshift({
+		$match: {
+			ageGroup:ageGroup
+		}
+	})
 	try {
 		const products = await Product.aggregate(pipeline);
 		res.send(products);
