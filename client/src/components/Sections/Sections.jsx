@@ -10,7 +10,7 @@ import { useScrollIntoView } from "@mantine/hooks";
 const Sections = () => {
   const { scrollIntoView: scrollIntoCollection, targetRef: collectionRef } =
     useScrollIntoView({
-      offset: 60,
+      offset: 1,
     });
   const { scrollIntoView: scrollIntoNewArravail, targetRef: newArravailRef } =
     useScrollIntoView({
@@ -31,28 +31,28 @@ const Sections = () => {
         <Button
           variant="outline"
           color="red"
-          onClick={() => scrollIntoCollection({ alignment: "center" })}
+          onClick={() => scrollIntoCollection({ alignment: "start" })}
         >
           Collections
         </Button>
         <Button
           variant="outline"
           color="red"
-          onClick={() => scrollIntoNewArravail({ alignment: "center" })}
+          onClick={() => scrollIntoNewArravail({ alignment: "start" })}
         >
           New Arrivals
         </Button>
         <Button
           variant="outline"
           color="red"
-          onClick={() => scrollIntoCateogres({ alignment: "center" })}
+          onClick={() => scrollIntoCateogres({ alignment: "start" })}
         >
           Cateogres
         </Button>
         <Button
           variant="outline"
           color="red"
-          onClick={() => scrollIntoStatics({ alignment: "center" })}
+          onClick={() => scrollIntoStatics({ alignment: "start" })}
         >
           Statics
         </Button>

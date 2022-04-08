@@ -1,27 +1,11 @@
-@use "../global/variables.module.scss";
-$primaryColor: variables.$primaryColor;
+@use "../../styles/global/mixins.module.scss";
 
-.dFlex {
+.container {
+  @include mixins.resetList;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-evenly;
   align-items: center;
-}
-
-.main-content {
-  @extend .dFlex;
-  position: relative;
-  width: 70%;
-  height: 100%;
   flex-wrap: wrap;
-  justify-content: space-between;
-  box-sizing: border-box;
-  margin: 50px auto;
-  padding: 50px 0 0;
-
-  h3 {
-    position: absolute;
-    left: 0;
-    top: 0;
-    color: $primaryColor;
-  }
+  gap: 3rem;
 }

@@ -1,0 +1,49 @@
+@use "../../styles/global/mixins.module.scss";
+@use "../../styles/global/variables.module.scss";
+
+$raduis: 0.75em;
+
+.container {
+  @include mixins.resetList;
+  display: flex;
+  flex-direction: column;
+  border-radius: $raduis;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  cursor: pointer;
+  //! image
+  .image {
+    flex: 3;
+    img {
+      border-radius: $raduis $raduis 0 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 1em 1em;
+    p {
+      margin-top: 0;
+    }
+    div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6em;
+      .price {
+        background-color: variables.$primaryColor;
+        padding: 0.1em 1em;
+        border-radius: 0.5em;
+        color: #fff;
+        font-weight: 800;
+      }
+    }
+  }
+}
