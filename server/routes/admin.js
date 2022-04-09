@@ -1,11 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-	addProduct,
-	psotHandlerCreator,
-	deleteHandlerCreator,
-} = require("../controllers/admin-controller");
-
+//multer
 const multer = require("multer");
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -31,81 +26,17 @@ const producCompiledSchema = require("../ajv/validator-schemas/product-schema");
 const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema");
 const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
 const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
-const Brand = require("../model/brands");
-const Category = require("../model/category");
-const Product = require("../model/product");
+//controllers
+const {addProduct,deleteProduct}=require("../controllers/product")
+const { deleteCategory, addCategory } = require("../controllers/category");
+const { addBrand, deleteBrand } = require("../controllers/brand");
+
+
+
 // router
-
-// will accept form-data--> uses multer to upload the file and pass any text to the req.body
-// the text data will be sent in the form of json with a json key
-/* 
-    data-->
-	form data :{
-	files--> the uploaded files
-	json--> {
-    "title":"product1 ",
-    "describtion":"a very good product",
-    "price": 33.3,
-    "discount":0,
-    "gender":"MALE",
-    "ageGroup":"ADULT",
-    "stock":{
-        "sizes":[
-            {
-                "size":"S",
-                "colors":[{
-                    "hexColor":"#ffffff",
-                    "qty": 33
-                },{
-                    "hexColor":"#eeeeee",
-                    "qty": 33
-                },{
-                    "hexColor":"#000000",
-                    "qty": 33
-                }]
-            }, {
-                "size":"M",
-                "colors":[{
-                    "hexColor":"#ffffff",
-                    "qty": 33
-                },{
-                    "hexColor":"#eeeeee",
-                    "qty": 33
-                },{
-                    "hexColor":"#000000",
-                    "qty": 33
-                }]
-            }, {
-                "size":"L",
-                "colors":[{
-                    "hexColor":"#ffffff",
-                    "qty": 33
-                },{
-                    "hexColor":"#eeeeee",
-                    "qty": 33
-                },{
-                    "hexColor":"#000000",
-                    "qty": 33
-                }]
-            }
-        ]
-    }
-}
-	}
-
-*/
-// to send product data as form data would be hard
-
-//using two request one as application/json and the other multipart json
-
-// product data as json-->sent firt the the user will get the prod id and make another
-//request to upload the images
-
-// router.use(["/add-product","add-category"],upload)
-
 router.post(
 	"/product",
-	upload.array("files", 5),
+	upload.any(),
 	parseJson,
 	fileExtensionValidator,
 	validator(producCompiledSchema),
@@ -118,7 +49,7 @@ router.post(
 	upload.single("image"),
 	fileExtensionValidator,
 	validator(categoryCompiledSchema),
-	psotHandlerCreator(Category, "imgUrl")
+    addCategory
 );
 
 //form data
@@ -127,25 +58,25 @@ router.post(
 	upload.single("image"),
 	fileExtensionValidator,
 	validator(brandCompiledSchema),
-	psotHandlerCreator(Brand, "logo")
+    addBrand
 );
 
 router.delete(
 	"/product/:id",
 	validator(objectIdCompiledSchema, true),
-	deleteHandlerCreator(Product)
+    deleteProduct
 );
 
 router.delete(
 	"/category/:id",
 	validator(objectIdCompiledSchema, true),
-	deleteHandlerCreator(Category)
+	deleteCategory
 );
 
 router.delete(
 	"/brand/:id",
 	validator(objectIdCompiledSchema, true),
-	deleteHandlerCreator(Brand)
+	deleteBrand
 );
 
 

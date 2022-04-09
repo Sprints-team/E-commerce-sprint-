@@ -20,6 +20,10 @@ const getProductsSchema = {
             type: "string",
             enum:["MALE","FEMALE"]
         },
+        ageGroup: {
+            type: "string",
+            enum:["ADULT","CHILD"]
+        },
         price: {
             type: "object",
             properties: {

@@ -1,52 +1,49 @@
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const secret = process.env.SECTRET_STRING;
+// const secret = process.env.SECTRET_STRING;
 
+const extractjsonToken = (headers) => {
+	const authHeader = headers["authorization"];
+	const jsonToken = authHeader ? authHeader.split(" ")[1] : false;
+	return jsonToken;
+};
 
-class Auth {
-	constructor(secret) {
-		this.secret = secret;
-	}
+const authorize = (headers,secret) => {
+	// extract the jwt from the request headers
+	const jsonToken =extractjsonToken(headers);
+	console.log(jsonToken);
+	//no jwt attached
+	if (!jsonToken) return null;
 
-    extractjsonToken=(headers)=> {
-        const authHeader = headers["authorization"];
-		const jsonToken = authHeader ? authHeader.split(" ")[1] : false;
-        return jsonToken
-    }
+	// verify jwt
+	let verifiedUser = null;
+	jwt.verify(jsonToken, secret, (err, user) => {
+		console.log(err);
+		if (err) return;
 
-    authorize (headers) {
-        console.log("authorize")
-		// extract the jwt from the request headers
-        const jsonToken = this.extractjsonToken(headers)
-        console.log(jsonToken)
-		//no jwt attached
-		if (!jsonToken)
-			return null
-
-		// verify jwt
-        let verifiedUser=null
-		jwt.verify(jsonToken, this.secret, (err, user) => {
-			console.log(err);
-			if (err) return
-
-			//adding the user object to the req
-			verifiedUser= user;
-
-        });
-        return verifiedUser
-    }
-    checkIfAdmin = (req, res, next) => {
-        // console.log("here")
-        const user = this.authorize(req.headers)
-        if (!user&&user.role !== 'ADMIN') return res.status(403).json({ error: "403", msg: "user is not authorized to make such an action" })
-        next()
-    }
-    checkIfUser=(req, res, next)=> {
-        req.user = this.authorize(req.headers)
-        next()
-    }
+		//adding the user object to the req
+		verifiedUser = user;
+	});
+	return verifiedUser;
 }
 
-const auth=new Auth(secret)
 
-module.exports = auth;
+exports.checkIfAdmin = (secret) => {
+	return (req, res, next) => {
+		const user = authorize(req.headers,secret);
+		console.log(user, "user");
+		if (!user || user.role !== "ADMIN")
+			return res.status(403).json({
+				error: "403",
+				msg: "user is not authorized to make such an action",
+			});
+		req.user=user
+		next();
+	}
+}
+
+exports.checkIfUser = (secret) => {
+	return (req, res, next)=> {
+	req.user = this.authorize(req.headers,secret);
+	next();
+}}
+

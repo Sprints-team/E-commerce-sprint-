@@ -13,6 +13,10 @@ const categorySchema = {
 			type: "string",
 			format: "alph-numeric",
 		},
+		gender: {
+			type: "string",
+			enum:["MALE","FEMALE","UNISEX","male","female","unisex"]
+		}
 	},
 	required: ["title", "describtion"],
 };

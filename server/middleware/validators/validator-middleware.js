@@ -10,6 +10,7 @@ const validator = (ajvValidator, params = false, query = false) => {
             }
          return next()
     }
+        console.log(req.body)
         const valid = ajvValidator(req.body)
         if (!valid) {
             const errors = ajvValidator.errors

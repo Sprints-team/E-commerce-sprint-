@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { PostSignUp,postLogin } = require("../controllers/auth-controller")
+const { PostSignUp,postLogin } = require("../controllers/auth")
 const validator = require("../middleware/validators/validator-middleware")
 const signupCompiledSchema= require("../ajv/validator-schemas/sign-up-schema")
 const loginCompiledSchema= require("../ajv/validator-schemas/login-schema")

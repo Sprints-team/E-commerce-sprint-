@@ -22,12 +22,12 @@ const productSchema = {
 			format: "alph-numeric",
 		},
 		price: {
-			type: "number",
-			minimum: 1,
+			type: "string",
+			// minimum: 1,
 		},
 		discount: {
-			type: "number",
-			minimum: 0,
+			type: "string",
+			// minimum: 0,
 		},
 		gender: {
 			type: "string",

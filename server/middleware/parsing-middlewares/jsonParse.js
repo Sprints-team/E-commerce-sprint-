@@ -1,9 +1,9 @@
 
 const parseJson = (req, res, next) => {
-    if (req.body.json) {
+    if (req.body.stock) {
         // console.log("json")
         try {
-            req.body = JSON.parse(req.body.json);
+            req.body.stock = JSON.parse(req.body.stock);
             return next();
         } catch (err) {
             return res.status(400).json({error:400,msg:"json field must be of json format"})
