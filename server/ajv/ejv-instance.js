@@ -42,6 +42,14 @@ ajvInstance.addFormat('universal-size', {
     validate:(string)=> checkIfUnvSize.test(string)
 })
 
+ajvInstance.addFormat("cate-abrv", {
+    validate:(input)=> input.trim().length===2
+})
+
+ajvInstance.addFormat("num-size", {
+    validate:(input)=>parseFloat(input)>22&&parseFloat(input)<50
+})
+
 ajvInstance.addFormat('hex-decimal-color', {
     validate:(string)=> checkIfhexColor.test(string)
 })
@@ -52,6 +60,10 @@ ajvInstance.addFormat("positive-number", {
 
 ajvInstance.addFormat("five-star-rating", {
     validate:(input)=>input>=0&&input<=5
+})
+
+ajvInstance.addFormat("number-string", {
+    validate:(input)=>parseFloat(input)!==NaN&& parseFloat(input)>=0
 })
 
 

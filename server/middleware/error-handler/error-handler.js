@@ -19,14 +19,14 @@ const handleValidationError = (err, res) => {
 
 // middleware for handling any error from the auth route 
 const authErrorHandler = (err, req, res, next) => {
-    
+    console.log(err)
     try {
         if(err.status===400) return res.status(err.status).json({error:400, msg:err.message})
         if (err.name === "ValidationError") return handleValidationError(err, res)
         if (err.code && err.code === 11000) return handleEmailDublicationError(err, res)
-        // --> fields yet to be added 
+        // --> fields yet to be added
 
-
+        return  res.status(500).json({error:"unknown error has occured"})
 } catch (err){
     res.status(500).json({error:"unknown error has occured"})
     }

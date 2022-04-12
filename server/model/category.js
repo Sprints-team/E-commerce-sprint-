@@ -8,6 +8,10 @@ const categorySchema = new mongoose.Schema({
         required: true,
         index:{unique:[true,"this category is taken"]}
     },
+    abrv: {
+        type: String,
+        required:true
+    },
     describtion: {
         type: String,
         required:true

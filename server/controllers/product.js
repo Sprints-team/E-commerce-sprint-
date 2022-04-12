@@ -5,6 +5,7 @@ const Product = require("../model/product");
 const ObjectId = mongoose.Types.ObjectId;
 const deleteImage = require("../helpers/deleteImages");
 const { deleteHandlerCreator } = require("../helpers/controller-creators");
+const getColorImages = require("../helpers/ge-color-Images");
 
 /* data received:
       1-the new product data  
@@ -20,7 +21,7 @@ exports.addProduct = async (req, res, next) => {
 		title,
 		describtion,
 		price,
-		stock,
+		colors,
 		category,
 		brand,
 		discount,
@@ -28,18 +29,21 @@ exports.addProduct = async (req, res, next) => {
 		ageGroup,
 	} = req.body;
 
-	const images = req.files.map((ele) => {
-		return `uploudes/${ele.filename}`;
-	});
+	// console.log(req.files,"files")
+	const images = getColorImages(req.files);
+	// const images = req.files.map((ele) => {
+	// 	return `uploudes/${ele.filename}`;
+	// });
+	console.log(images);
 
 	const product = new Product({
-		price: price,
+		price: +price,
 		title: title,
 		describtion: describtion,
 		discount,
 		gender,
 		ageGroup,
-		stock: stock,
+		colors: colors,
 		category: category,
 		brand: brand,
 		images,
@@ -68,7 +72,9 @@ exports.getProduct = async (req, res, next) => {
 			.where("_id")
 			.equals(id)
 			.populate("category", "title")
-			.populate("brand", "title");
+			.populate("brand", "title")
+			.populate("skus")
+			.select("-colors");
 
 		const product = await query.exec();
 		if (!product) {
@@ -99,12 +105,21 @@ exports.getProducts = async (req, res, next) => {
 	//1->match 2-->lookup || project
 	let pipeline = [
 		{
+			$lookup: {
+				from: "skus",
+				localField: "skus",
+				foreignField: "_id",
+				as:"skus"
+			}
+		},
+		{
 			$project: {
 				title: 1,
 				price: 1,
 				images: 1,
 				ageGroup: 1,
 				rate: "$reviews.rating",
+				skus:1
 			},
 		},
 	];
@@ -206,7 +221,7 @@ exports.getProducts = async (req, res, next) => {
 
 	pipeline.push({ $limit: limit || 20 });
 
-	return res.send(pipeline);
+	// return res.send(pipeline);
 	try {
 		const products = await Product.aggregate(pipeline);
 		res.send(products);

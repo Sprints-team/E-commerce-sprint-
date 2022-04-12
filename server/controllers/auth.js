@@ -39,12 +39,12 @@ exports.postLogin = async(req, res) => {
         //wrong password
         if (!validPassword) return res.status(403).json({ error: "403", msg: "user entered a wrong password" })
 
-        const token = jwt.sign({ userName: user.name, role: user.role, email: user.email }, secret)
+        const token = jwt.sign({ userName: user.name, role: user.role, email: user.email,userId:user._id }, secret)
         res.status(200).json({
             jsonToken: token,
             user: {
                 email: user.email,
-                name: user.name
+                name: user.name,
                 // -->we can add a user image url
         }})
     } catch (err) {

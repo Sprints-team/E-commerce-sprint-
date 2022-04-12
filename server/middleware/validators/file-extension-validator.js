@@ -1,5 +1,4 @@
 const fileExtensionValidator = (req, res, next) => {
-    console.log("here2")
     if (!req.files&&!req.file)
         return res.status(400).json({ error: "400", msg: "no files were sent" });
     
@@ -16,7 +15,6 @@ const fileExtensionValidator = (req, res, next) => {
                 .json({ error: "400", msg: "only allow image file formats" });
         }
     }
-    console.log("here")
     next();
 }
 

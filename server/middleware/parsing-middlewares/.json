@@ -1,0 +1,18 @@
+
+
+
+[
+  {"color": "#ffffff",
+  "sizes": [
+      { "size": "S", "qty": 2 },
+      { "size": "M", "qty": 2 },
+      { "size": "L", "qty": 2 }
+  ]
+  },{"color": "#000000",
+  "sizes": [
+      { "size": "S", "qty": 2 },
+      { "size": "M", "qty": 2 },
+      { "size": "L", "qty": 2 }
+  ]
+  }
+]

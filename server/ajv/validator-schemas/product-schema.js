@@ -23,10 +23,12 @@ const productSchema = {
 		},
 		price: {
 			type: "string",
+			format: "number-string",
 			// minimum: 1,
 		},
 		discount: {
 			type: "string",
+			format: "number-string",
 			// minimum: 0,
 		},
 		gender: {
@@ -37,54 +39,48 @@ const productSchema = {
 			type: "string",
 			enum: ["ADULT", "CHILD"],
 		},
-		stock: {
-			type: "object",
-			properties: {
-				sizes: {
-					type: "array",
-					uniqueItems: true,
-					items: {
-						type: "object",
-						properties: {
-							size: {
-								type: "string",
-								format: "universal-size",
-							},
-							colors: {
-								type: "array",
-								uniqueItems: true,
-								items: {
-									type: "object",
-									properties: {
-										hexColor: {
-											type: "string",
-											format: "hex-decimal-color",
-										},
-										qty: {
-											type: "number",
-											minimum: 1,
-										},
-									},
-									required: ["hexColor", "qty"],
+		colors: {
+			type: "array",
+			uniqueItems: true,
+			items: {
+				type: "object",
+				properties: {
+					color: {
+						type: "string",
+						format: "hex-decimal-color",
+					},
+					sizes: {
+						type: "array",
+						uniqueItems: true,
+						items: {
+							type: "object",
+							properties: {
+								size: {
+									type: "string",
+									oneOf:[{format:"universal-size",},{format:"num-size"}]
+								},
+								qty: {
+									type: "number",
+									minimum: 1,
 								},
 							},
+							// required: ["size", "qty"],
 						},
-						required: ["size", "colors"],
 					},
 				},
+				// required: ["size", "colors"],
 			},
-			required: ["sizes"],
 		},
 		category: {
 			type: "string",
-			format:"objectId"
+			format: "objectId",
 		},
 		brand: {
 			type: "string",
-			format:"objectId"
+			format: "objectId",
 		},
 	},
-	required: ["title", "price", "stock", "describtion","gender","discount","ageGroup",]
+	required: ["title", "price", "describtion", "gender", "ageGroup"],
 };
 
 module.exports = ajvInstance.compile(productSchema);

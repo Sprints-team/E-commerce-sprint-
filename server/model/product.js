@@ -4,34 +4,19 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const NotFound = require("../errors/not-found");
 const Brand = require("./brands");
 const Category = require("./category");
+const SKU = require("./sku");
+const Index = require("./sku-index");
 
 // schemas
 const reviewSchema = new mongoose.Schema({
-	userId: ObjectId,
+	userId: {
+		type: ObjectId,
+		ref: "user",
+	},
 	content: String,
 	rating: Number,
 });
 
-const stockSchema = new mongoose.Schema({
-	sizes: [
-		{
-			size: String,
-			colors: [
-				{
-					hexColor: {
-						type: String,
-						required: true,
-					},
-					qty: {
-						type: Number,
-						required: true,
-						min: 0,
-					},
-				},
-			],
-		},
-	],
-});
 
 const productSchema = new mongoose.Schema({
 	title: {
@@ -47,7 +32,17 @@ const productSchema = new mongoose.Schema({
 		type: String,
 		enum: ["ADULT", "CHILD"],
 	},
-	stock: stockSchema,
+	colors: [],
+	images: {
+		type: Object,
+	},
+	skus: [
+		{
+			type: ObjectId,
+			ref: "sku",
+			required: true,
+		},
+	],
 	price: {
 		type: Number,
 		required: true,
@@ -70,7 +65,6 @@ const productSchema = new mongoose.Schema({
 			default: 0,
 		},
 	},
-	images: [String],
 	category: {
 		type: ObjectId,
 		ref: "category",
@@ -97,22 +91,64 @@ productSchema.statics.addImages = async function (id, imgArr) {
 	}
 };
 
-
 // doc method
 
 //the Model
 
 // middlewares
 productSchema.pre("save", async function (next) {
-	const cat = await Category.find({ _id: this.category });
-    const brd = await Brand.find({ _id: this.brand });
-    let errMsg=""
-	if (cat.length === 0) errMsg+="category doesn't exist"
-    if (brd.length === 0) errMsg +=errMsg?" and brand doesn't exist":"brand doesn't exist"
-    if(errMsg) return next(new BadRequest(errMsg)) 
-	return next();
+	// console.log(this, "preSave");
+	try {
+		// checking if the brand or category exist
+		const cat = await Category.findOne({ _id: this.category }).select("abrv");
+		//passing the abrv to the next middleware
+		this.abrv=cat.abrv
+		const brd = await Brand.exists({ _id: this.brand });
+		let errMsg = "";
+		if (cat.length === 0) errMsg += "category doesn't exist";
+		if (!brd)
+			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
+		if (errMsg) return next(new BadRequest(errMsg));
+	} catch (err) {
+		next(err);
+	}
 });
 
+//saving skus
+productSchema.pre("save", async function (next) {
+	const stock = this.colors;
+	try {
+		let index = await Index.autoIncrement();
+		const skus = [];
+		for (ele in stock) {
+			const sku = new SKU({
+				sku: `${this.abrv}-${stock[ele].color.substr(1)}-`,
+				sizes: stock[ele].sizes,
+				images: this.images[stock[ele].color],
+				productId: this._id,
+			});
+			await sku.save();
+			skus.push(sku._id);
+			index += 1;
+		}
+		Index.updateOne(
+			{ ref: "sku" },
+			{
+				$set: {
+					index: index,
+				},
+			}
+		).exec();
+		this.images = undefined;
+		this.stock = undefined;
+		this.colors=undefined
+		this.abrv=undefined
+		this.skus = skus;
+		next();
+	} catch (err) {
+		next(err);
+	}
+});
 
 const Product = mongoose.model("product", productSchema);
 
