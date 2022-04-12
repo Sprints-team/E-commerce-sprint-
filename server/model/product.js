@@ -32,7 +32,9 @@ const productSchema = new mongoose.Schema({
 		type: String,
 		enum: ["ADULT", "CHILD"],
 	},
-	colors: [],
+	colors: {
+		type:Object
+	},
 	images: {
 		type: Object,
 	},
@@ -92,12 +94,9 @@ productSchema.statics.addImages = async function (id, imgArr) {
 };
 
 // doc method
+productSchema.methods.addProduct = async function () {
+	const stock = this.colors;
 
-//the Model
-
-// middlewares
-productSchema.pre("save", async function (next) {
-	// console.log(this, "preSave");
 	try {
 		// checking if the brand or category exist
 		const cat = await Category.findOne({ _id: this.category }).select("abrv");
@@ -108,47 +107,117 @@ productSchema.pre("save", async function (next) {
 		if (cat.length === 0) errMsg += "category doesn't exist";
 		if (!brd)
 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
-		if (errMsg) return next(new BadRequest(errMsg));
-	} catch (err) {
-		next(err);
-	}
-});
+		if (errMsg) throw new BadRequest(errMsg)
 
-//saving skus
-productSchema.pre("save", async function (next) {
-	const stock = this.colors;
-	try {
-		let index = await Index.autoIncrement();
-		const skus = [];
-		for (ele in stock) {
-			const sku = new SKU({
-				sku: `${this.abrv}-${stock[ele].color.substr(1)}-`,
-				sizes: stock[ele].sizes,
-				images: this.images[stock[ele].color],
-				productId: this._id,
-			});
-			await sku.save();
-			skus.push(sku._id);
-			index += 1;
-		}
-		Index.updateOne(
-			{ ref: "sku" },
-			{
-				$set: {
-					index: index,
-				},
+
+		const session = await mongoose.startSession()
+		await session.withTransaction(async () => {
+
+
+
+
+
+
+			
+			let index = await Index.autoIncrement();
+			const skus = [];
+			for (let ele in stock) {
+				const sku = new SKU({
+					sku: `${this.abrv}-${ele.substring(1)}-`,
+					sizes: stock[ele],
+					images: this.images[ele],
+					price:this.price,
+					productId: this._id,
+				});
+				await sku.save();
+				skus.push(sku._id);
+				index += 1;
 			}
-		).exec();
-		this.images = undefined;
-		this.stock = undefined;
-		this.colors=undefined
-		this.abrv=undefined
-		this.skus = skus;
-		next();
+			Index.updateOne(
+				{ ref: "sku" },
+				{
+					$set: {
+						index: index,
+					},
+				}
+			).exec();
+			this.images = undefined;
+			this.stock = undefined;
+			this.colors=undefined
+			this.abrv=undefined
+			this.skus = skus;
+	
+			this.save()
+		})
+		await session.endSession()
+		return {
+			saved:true
+		}
 	} catch (err) {
-		next(err);
+		return err
 	}
-});
+}
+
+//the Model
+
+// middlewares
+// productSchema.pre("save", async function (next) {
+// 	// console.log(this, "preSave");
+// 	try {
+// 		// checking if the brand or category exist
+// 		const cat = await Category.findOne({ _id: this.category }).select("abrv");
+// 		//passing the abrv to the next middleware
+// 		this.abrv=cat.abrv
+// 		const brd = await Brand.exists({ _id: this.brand });
+// 		let errMsg = "";
+// 		if (cat.length === 0) errMsg += "category doesn't exist";
+// 		if (!brd)
+// 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
+// 		if (errMsg) return next(new BadRequest(errMsg));
+// 	} catch (err) {
+// 		next(err);
+// 	}
+// });
+
+// //saving skus
+// productSchema.pre("save", async function (next) {
+// 	const stock = this.colors;
+// 	try {
+// 		let index = await Index.autoIncrement();
+// 		const skus = [];
+// 		for (ele in stock) {
+// 			const sku = new SKU({
+// 				sku: `${this.abrv}-${stock[ele].color.substr(1)}-`,
+// 				sizes: stock[ele].sizes,
+// 				images: this.images[stock[ele].color],
+// 				price:this.price,
+// 				productId: this._id,
+// 			});
+// 			await sku.save();
+// 			skus.push(sku._id);
+// 			index += 1;
+// 		}
+// 		Index.updateOne(
+// 			{ ref: "sku" },
+// 			{
+// 				$set: {
+// 					index: index,
+// 				},
+// 			}
+// 		).exec();
+// 		this.images = undefined;
+// 		this.stock = undefined;
+// 		this.colors=undefined
+// 		this.abrv=undefined
+// 		this.skus = skus;
+// 		next();
+// 	} catch (err) {
+// 		next(err);
+// 	}
+// });
+
+
+
 
 const Product = mongoose.model("product", productSchema);
 

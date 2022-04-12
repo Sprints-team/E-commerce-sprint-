@@ -32,20 +32,9 @@ const orderSchema = new mongoose.Schema({
 		type: ObjectId,
 		required: true,
 	},
-	products: [
-		{
-			sku: {
-				type: String,
-			},
-			size: {
-				type: String,
-			},
-			qty: {
-				type: Number,
-				min: 1,
-			},
-		},
-	],
+	products: {
+		type:Object
+	},
 	shippingAdress: {
 		country: {
 			type: String,
@@ -92,42 +81,60 @@ const orderSchema = new mongoose.Schema({
 //static methods
 
 // doc methods
+/* 
+{sku:}}
+*/
+//{sku:{size,qty,price}}
 orderSchema.methods.checkInventoryAndOrder = async function () {
+	const session = await mongoose.startSession()
 	const or = [];
-	const skuObj = {};
-	for (let ind in this.products) {
-		or.push({ sku: this.products[ind].sku });
-		skuObj[this.products[ind].sku] = {
-			qty: this.products[ind].qty,
-			size: this.products[ind].size,
-		};
+	console.log(this.products)
+	for (let sku in this.products) {
+		or.push({ sku: sku});
 	}
-	const skus = await SKU.find().or(or).select(["sku", "sizes"]);
-	let enoughStore = true;
-	skus.forEach((sku) => {
-		if (
-			sku.sizes.find((ele) => ele.size === skuObj[sku.sku].size).qty >=
-			skuObj[sku.sku].qty
-		)
-			return;
-		enoughStore = false;
-	});
-
-	if (enoughStore) {
-		for (let sku in skuObj) {
-			await SKU.updateOne(
-				{ sku: sku, "sizes.size": skuObj[sku].size },
-				{
-					$inc: {
-						"sizes.$.qty": -skuObj[sku].qty,
-					},
+	try {
+		let enoughStore = true;
+		await session.withTransaction(async () => {
+			const skus = await SKU.find().or(or).select(["sku", "sizes", "price"]);
+			skus.forEach((prod) => {
+				if (
+					this.products[prod.sku].qty <= prod.sizes[this.products[prod.sku].size].qty
+				) {
+					this.products[prod.sku].price=prod.price
+					return;
 				}
-			);
+				enoughStore = false;
+			});
+		
+			if (enoughStore) {
+				for (let sku in this.products) {
+					let updateField=`sizes.${this.products[sku].size}.qty`
+					await SKU.updateOne(
+						{ sku: sku },
+						{
+							$inc: {
+								[updateField] : -this.products[sku].qty,
+							},
+						}
+					);
+				}
+				return await this.save();
+			}
+		})
+		await session.endSession()
+		if (enoughStore) return {
+			placed:true
+		}
+		if (!enoughStore) return {
+			placed: false,
+			err:"there is no enough items"
+		}
+	} catch (err) {
+		return {
+			placed: false,
+			err:err.message
 		}
 	}
-
-	const save=await this.save();
-	return save;
 };
 
 //model

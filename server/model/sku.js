@@ -11,22 +11,16 @@ const schema = new mongoose.Schema({
     required: true,
     index:{unique:true}
   },
-  sizes: [{
-    size: {
-      type: String,
-      required:true
-    },
-    qty: {
-      type: Number,
-      required:true,
-      min:0
-    }
-  }],
+  sizes: {},
   discount: {
     type: Number,
     default:0
   },
   images: [String],
+  price: {
+    type: Number,
+    required:true
+  },
   productId: {
     type: ObjectId,
     ref:"product"

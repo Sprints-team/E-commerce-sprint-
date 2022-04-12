@@ -40,36 +40,28 @@ const productSchema = {
 			enum: ["ADULT", "CHILD"],
 		},
 		colors: {
-			type: "array",
-			uniqueItems: true,
-			items: {
-				type: "object",
-				properties: {
-					color: {
-						type: "string",
-						format: "hex-decimal-color",
-					},
-					sizes: {
-						type: "array",
-						uniqueItems: true,
-						items: {
+			type: "object",
+			patternProperties: {
+				"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$": {
+					type: "object",
+					patternProperties: {
+						'^(?:[1-9]|[2-4][0-9]|50)$': {
 							type: "object",
 							properties: {
-								size: {
-									type: "string",
-									oneOf:[{format:"universal-size",},{format:"num-size"}]
-								},
-								qty: {
-									type: "number",
-									minimum: 1,
-								},
-							},
-							// required: ["size", "qty"],
+								qty:{type:"number"}
+							}
+						},
+						"^(\d*(?:M|X{0,2}[SL]))(?:$|\s+.*$)": {
+							type: "object",
+							properties: {
+								qty:{type:"number"}
+							}
 						},
 					},
-				},
-				// required: ["size", "colors"],
+					additionalProperties: false
+				}
 			},
+			additionalProperties: false
 		},
 		category: {
 			type: "string",

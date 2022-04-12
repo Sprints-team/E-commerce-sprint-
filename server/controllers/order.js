@@ -1,6 +1,6 @@
 const Order = require("../model/orders");
 
-// products-->[{sku,size,qty}]
+// products-->{sku:{,size,qty,price}}
 exports.order = async (req, res, next) => {
 	const { products, country, governerate, city, zipCode, adress } = req.body;
   const userId = req.user.userId;

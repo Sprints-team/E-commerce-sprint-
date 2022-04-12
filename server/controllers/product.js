@@ -34,7 +34,6 @@ exports.addProduct = async (req, res, next) => {
 	// const images = req.files.map((ele) => {
 	// 	return `uploudes/${ele.filename}`;
 	// });
-	console.log(images);
 
 	const product = new Product({
 		price: +price,
@@ -49,10 +48,11 @@ exports.addProduct = async (req, res, next) => {
 		images,
 	});
 	try {
-		const response = await product.save();
-		res
-			.status(200)
-			.json({ msg: "product has bean added succesfully", id: response._id });
+		const response = await product.addProduct();
+		if (response.saved)
+			res
+				.status(200)
+				.json({ msg: "product has bean added succesfully", id: response._id });
 	} catch (err) {
 		next(err, req, res, next);
 	}
@@ -109,8 +109,8 @@ exports.getProducts = async (req, res, next) => {
 				from: "skus",
 				localField: "skus",
 				foreignField: "_id",
-				as:"skus"
-			}
+				as: "skus",
+			},
 		},
 		{
 			$project: {
@@ -119,7 +119,7 @@ exports.getProducts = async (req, res, next) => {
 				images: 1,
 				ageGroup: 1,
 				rate: "$reviews.rating",
-				skus:1
+				skus: 1,
 			},
 		},
 	];
