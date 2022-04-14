@@ -44,11 +44,11 @@ exports.checkIfAdmin = (secret) => {
 exports.checkIfUser = (secret) => {
 	return (req, res, next) => {
 		const user=authorize(req.headers,secret);
-		// if (!user || user.role !== "USER")
-		// return res.status(403).json({
-		// 	error: "403",
-		// 	msg: "user is not authorized to make such an action",
-		// });
+		if (!user)
+		return res.status(403).json({
+			error: "403",
+			msg: "user is not authorized to make such an action",
+		});
 	req.user =user
 	next();
 }}

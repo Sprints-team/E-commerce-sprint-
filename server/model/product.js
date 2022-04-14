@@ -17,7 +17,6 @@ const reviewSchema = new mongoose.Schema({
 	rating: Number,
 });
 
-
 const productSchema = new mongoose.Schema({
 	title: {
 		type: String,
@@ -33,7 +32,7 @@ const productSchema = new mongoose.Schema({
 		enum: ["ADULT", "CHILD"],
 	},
 	colors: {
-		type:Object
+		type: Object,
 	},
 	images: {
 		type: Object,
@@ -99,125 +98,61 @@ productSchema.methods.addProduct = async function () {
 
 	try {
 		// checking if the brand or category exist
-		const cat = await Category.findOne({ _id: this.category }).select("abrv");
+		const catPromise = Category.findOne({ _id: this.category }).select("abrv");
 		//passing the abrv to the next middleware
-		this.abrv=cat.abrv
-		const brd = await Brand.exists({ _id: this.brand });
+		const brdPromise = Brand.exists({ _id: this.brand });
+		const results = await Promise.all([catPromise, brdPromise]);
+		const [cat, brd] = results;
+		this.abrv = cat.abrv;
 		let errMsg = "";
 		if (cat.length === 0) errMsg += "category doesn't exist";
 		if (!brd)
 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
-		if (errMsg) throw new BadRequest(errMsg)
+		if (errMsg) throw new BadRequest(errMsg);
 
-
-		const session = await mongoose.startSession()
-		await session.withTransaction(async () => {
-
-
-
-
-
-
-			
-			let index = await Index.autoIncrement();
-			const skus = [];
-			for (let ele in stock) {
-				const sku = new SKU({
-					sku: `${this.abrv}-${ele.substring(1)}-`,
-					sizes: stock[ele],
-					images: this.images[ele],
-					price:this.price,
-					productId: this._id,
-				});
-				await sku.save();
-				skus.push(sku._id);
-				index += 1;
-			}
-			Index.updateOne(
-				{ ref: "sku" },
-				{
-					$set: {
-						index: index,
-					},
-				}
-			).exec();
-			this.images = undefined;
-			this.stock = undefined;
-			this.colors=undefined
-			this.abrv=undefined
-			this.skus = skus;
-	
-			this.save()
-		})
-		await session.endSession()
-		return {
-			saved:true
+		let index = await Index.autoIncrement();
+		const skus = [];
+		const promises = [];
+		for (let ele in stock) {
+			const sku = new SKU({
+				sku: `${this.abrv}-${ele.substring(1)}-`,
+				sizes: stock[ele],
+				images: this.images[ele],
+				price: this.price,
+				productId: this._id,
+			});
+			// await sku.save();
+			promises.push(sku.save());
+			skus.push(sku._id);
+			index += 1;
 		}
+		Index.updateOne(
+			{ ref: "sku" },
+			{
+				$set: {
+					index: index,
+				},
+			}
+		).exec();
+		this.images = undefined;
+		this.stock = undefined;
+		this.colors = undefined;
+		this.abrv = undefined;
+		this.skus = skus;
+		const save = this.save();
+		const result = await Promise.all([...promises, save]);
+		console.log(result);
+		return {
+			saved: true,
+		};
 	} catch (err) {
-		return err
+		return err;
 	}
-}
+};
 
 //the Model
 
 // middlewares
-// productSchema.pre("save", async function (next) {
-// 	// console.log(this, "preSave");
-// 	try {
-// 		// checking if the brand or category exist
-// 		const cat = await Category.findOne({ _id: this.category }).select("abrv");
-// 		//passing the abrv to the next middleware
-// 		this.abrv=cat.abrv
-// 		const brd = await Brand.exists({ _id: this.brand });
-// 		let errMsg = "";
-// 		if (cat.length === 0) errMsg += "category doesn't exist";
-// 		if (!brd)
-// 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
-// 		if (errMsg) return next(new BadRequest(errMsg));
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// });
-
-// //saving skus
-// productSchema.pre("save", async function (next) {
-// 	const stock = this.colors;
-// 	try {
-// 		let index = await Index.autoIncrement();
-// 		const skus = [];
-// 		for (ele in stock) {
-// 			const sku = new SKU({
-// 				sku: `${this.abrv}-${stock[ele].color.substr(1)}-`,
-// 				sizes: stock[ele].sizes,
-// 				images: this.images[stock[ele].color],
-// 				price:this.price,
-// 				productId: this._id,
-// 			});
-// 			await sku.save();
-// 			skus.push(sku._id);
-// 			index += 1;
-// 		}
-// 		Index.updateOne(
-// 			{ ref: "sku" },
-// 			{
-// 				$set: {
-// 					index: index,
-// 				},
-// 			}
-// 		).exec();
-// 		this.images = undefined;
-// 		this.stock = undefined;
-// 		this.colors=undefined
-// 		this.abrv=undefined
-// 		this.skus = skus;
-// 		next();
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// });
-
-
-
 
 const Product = mongoose.model("product", productSchema);
 

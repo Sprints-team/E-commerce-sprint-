@@ -72,7 +72,7 @@ const productSchema = {
 			format: "objectId",
 		},
 	},
-	required: ["title", "price", "describtion", "gender", "ageGroup"],
+	required: ["title", "price", "describtion", "gender", "ageGroup","colors"],
 };
 
 module.exports = ajvInstance.compile(productSchema);

@@ -10,7 +10,7 @@ const validator = (ajvValidator, params = false, query = false) => {
             }
          return next()
     }
-        const valid = ajvValidator(req.body)
+        const valid = ajvValidator({...req.body,...req.query})
         if (!valid) {
             const errors = ajvValidator.errors
             return res.status(400).json({error:"400",errors})

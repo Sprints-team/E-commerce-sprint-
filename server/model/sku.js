@@ -24,6 +24,11 @@ const schema = new mongoose.Schema({
   productId: {
     type: ObjectId,
     ref:"product"
+  },
+  soldItems: {
+    type: Number,
+    min: 0,
+    default:0
   }
 })
 

@@ -50,6 +50,13 @@ ajvInstance.addFormat("num-size", {
     validate:(input)=>parseFloat(input)>22&&parseFloat(input)<50
 })
 
+ajvInstance.addFormat("size", {
+    validate: (input) => {
+        if ((parseFloat(input) > 22 && parseFloat(input) < 50) || checkIfUnvSize.test(input)) return true
+        return false
+    }
+})
+
 ajvInstance.addFormat('hex-decimal-color', {
     validate:(string)=> checkIfhexColor.test(string)
 })

@@ -26,10 +26,12 @@ const producCompiledSchema = require("../ajv/validator-schemas/product-schema");
 const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema");
 const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
 const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
+const orderStatus = require("../ajv/validator-schemas/order-status");
 //controllers
 const {addProduct,deleteProduct}=require("../controllers/product")
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
+const { updateOrderStatus } = require("../controllers/order");
 
 
 
@@ -60,6 +62,13 @@ router.post(
 	validator(brandCompiledSchema),
     addBrand
 );
+
+//put
+router.put("/order",validator(orderStatus),updateOrderStatus)
+
+
+
+//delete
 
 router.delete(
 	"/product/:id",
