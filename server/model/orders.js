@@ -89,10 +89,13 @@ const orderSchema = new mongoose.Schema({
 		},
 		message: {
 			type: String,
-			default:undefined
+			default: undefined,
 		},
 		statusTimeStamp: [
-			[]
+			{
+				type: Array,
+				default: [new Date(), "PROCESSING"],
+			},
 		],
 	},
 	deliveryTime: {
@@ -111,52 +114,56 @@ const orderSchema = new mongoose.Schema({
 });
 
 //static methods
-orderSchema.statics.cancelOrder = async function (id,userId) {
-	try {
-		const order = await this.findById(id)
+orderSchema.statics.cancelOrder = async function (id, user) {
+	const order = await this.findOne({ _id: id });
 
-		if (!order) return {
+	if (!order)
+		return {
 			status: 404,
-			msg:"couldn't find your order"
-		}
+			msg: "couldn't find your order",
+		};
+	if (user?.role === "USER") {
+		if (order.userId.toHexString() !== user.userId)
+			return {
+				status: 400,
+				msg: "can't cancel order that is not yours",
+			};
 
-		if (order.status.currentStatus !== "PROCESSING") return {
-			status: 403,
-			msg:"can't cancel order after it got out with carrier"
-		}
-		const promises= []
-		order.products.forEach(prod => {
-			const updateField=`sizes.${prod.size}.qty`
-			promises.push(SKU.updateOne(
-				{ _id: _id },
+		if (order.status.currentStatus !== "PROCESSING")
+			return {
+				status: 403,
+				msg: "can't cancel order after it got out with carrier",
+			};
+	}
+	const promises = [];
+	order.products.forEach((prod) => {
+		const updateField = `sizes.${prod.size}.qty`;
+		promises.push(
+			SKU.updateOne(
+				{ _id: prod.skuId },
 				{
 					$inc: {
 						[updateField]: prod.qty,
 					},
 				}
-			))
-		})
+			)
+		);
+	});
 
-		order.status.currentStatus = "CANCELED"
-		order.status.statusTimeStamp = [...order.status.statusTimeStamp, [new Date(), "CANCELED"]]
-		order.status.message = "user canceled order"
-		
-
-		const result = await Promise.all([...promises, order.save()])
-		console.log(result)
-		return {
-			status: 200,
-			msg:"order deleted successfully"
-		}
-	} catch (err) {
-		return {
-			status: 400,
-			msg: err.message
-		}
-	}
-}
+	order.status.currentStatus = "CANCELED";
+	order.status.statusTimeStamp = [
+		...order.status.statusTimeStamp,
+		[new Date(), "CANCELED"],
+	];
+	order.status.message = "user canceled order";
 
 
+	await Promise.all([...promises, order.save()]);
+	return {
+		status: 200,
+		msg: "order canceled successfully",
+	};
+};
 
 // doc methods
 /* 
@@ -166,39 +173,37 @@ orderSchema.statics.cancelOrder = async function (id,userId) {
 orderSchema.methods.checkInventoryAndOrder = async function () {
 	const session = await mongoose.startSession();
 	const or = [];
-	console.log(this.products);
+
 	const productObj = {};
 	for (let ele of this.products) {
 		or.push({ _id: ele.skuId });
 		productObj[ele.skuId] = ele;
 	}
-	// console.log(productObj)
 
 	try {
 		let enoughStore = true;
 
 		let totalPrice = 0;
 		const skus = await SKU.find()
-		.or(or)
-		.select(["sku", "sizes", "price", "discount"]);
-		
+			.or(or)
+			.select(["sku", "sizes", "price", "discount"]);
+
 		skus.forEach((prod) => {
 			if (
 				productObj[prod._id].qty <= prod.sizes[productObj[prod._id].size].qty
-				) {
-					// this.products[prod.sku].price = prod.price
-					totalPrice +=
+			) {
+				// this.products[prod.sku].price = prod.price
+				totalPrice +=
 					productObj[prod._id].qty * prod.price -
 					productObj[prod._id].qty * prod.price * (prod.discount / 100);
-					productObj[prod._id].sku = prod.sku;
-					return;
-				}
-				enoughStore = false;
-			});
-			console.log(totalPrice, "totalPrice");
-			// return
-			if (enoughStore) {
-				await session.withTransaction(async () => {
+				productObj[prod._id].sku = prod.sku;
+				return;
+			}
+			enoughStore = false;
+		});
+		// return
+		if (enoughStore) {
+			await session.withTransaction(async () => {
 				let promises = [];
 				for (let _id in productObj) {
 					let updateField = `sizes.${productObj[_id].size}.qty`;
@@ -214,11 +219,10 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 					);
 				}
 				this.totalPrice = totalPrice;
-				this.status.statusTimeStamp=[new Date()]
-				const results = await Promise.all([...promises,this.save()])
-				console.log(results)
+				this.status.statusTimeStamp = [new Date()];
+				await Promise.all([...promises, this.save()]);
 			});
-			}
+		}
 		// return totalPrice.toString()
 		if (enoughStore)
 			return {

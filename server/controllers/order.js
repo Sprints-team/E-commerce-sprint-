@@ -47,6 +47,11 @@ exports.updateOrderStatus = async (req, res, next) => {
 	const id = req.body.id || req.query.id;
 	const message = req.body.message || req.query.message;
 
+
+	if (status === "CANCELED") {
+		const response = await Order.cancelOrder(id)
+		return res.status(response.status).json({msg:response.msg})
+	}
 	const whereObject = {
 		id: id,
 		$nor: [
@@ -90,20 +95,16 @@ exports.updateOrderStatus = async (req, res, next) => {
 
 exports.cancelOrder = async(req, res, next) => {
 	const id = req.body.id || req.query.id
-	const userId = req.user.id
+	const user = req.user
 	
 	try {
-	const result = Order.updateOne({ _id: id, userId: userId,"status.currentStatus" :"PROCESSING"}, {
-		$set: {
-			"status.currentStatus": "CANCELED",
-		},	$push: {
-			"status.statusTimeStamp": [new Date(),"CANCELED"],
-		}
-	})
 		
-		Order.cancelOrder(id,userId)
-	if(result.modifiedCount===0) return res.status(400).json({error:"400", msg:"order is not cancelled"})
-		return res.status(200).json({msg:"order canceled successfully"});
+		const response = await Order.cancelOrder(id, user)
+		console.log(response)
+		
+		
+	// if(result.modifiedCount===0) return res.status(400).json({error:"400", msg:"order is not cancelled"})
+		return res.status(response.status).json({msg:response.msg});
 		
 	} catch (err) {
 		next(err,req,res,next)
