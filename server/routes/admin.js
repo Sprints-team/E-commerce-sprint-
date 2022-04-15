@@ -27,15 +27,26 @@ const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema"
 const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
 const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
 const orderStatus = require("../ajv/validator-schemas/order-status");
+const getOrderSchem= require("../ajv/validator-schemas/get-order")
 //controllers
 const {addProduct,deleteProduct}=require("../controllers/product")
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
-const { updateOrderStatus } = require("../controllers/order");
+const { updateOrderStatus, getOrders } = require("../controllers/order");
 
 
 
 // router
+
+
+
+
+//get
+router.get("/orders", validator(getOrderSchem), getOrders)
+
+
+
+//post
 router.post(
 	"/product",
 	upload.any(),

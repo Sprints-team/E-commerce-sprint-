@@ -4,22 +4,25 @@ const schema = {
 	type: "object",
 	properties: {
 		products: {
-			type: "object",
-			patternProperties: {
-				"[^]*": {
-					type: "object",
-					properties: {
-						size: {
-							type: "string",
-							format: "size",
-						},
-						qty: {
-							type: "number",
-							minimum: 1,
-						},
+			type: "array",
+			items: {
+				type: "object",
+				properties: {
+					skuId: {
+						type: "string",
+						format:"objectId"
 					},
+					qty: {
+						type: "number",
+						minimum:1
+					},
+					size: {
+						type: "string",
+						format:"size"
+					}
 				},
-			},
+				required:["skuId","qty","size"]
+			}
 		},
 
 		country: {

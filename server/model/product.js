@@ -31,9 +31,11 @@ const productSchema = new mongoose.Schema({
 		type: String,
 		enum: ["ADULT", "CHILD"],
 	},
+	//--
 	colors: {
 		type: Object,
 	},
+	//--
 	images: {
 		type: Object,
 	},
@@ -53,6 +55,7 @@ const productSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	// --
 	discount: {
 		type: Number,
 		default: 0,

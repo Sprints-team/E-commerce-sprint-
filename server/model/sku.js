@@ -2,6 +2,15 @@ const mongoose = require("mongoose");
 const Index = require("./sku-index");
 const ObjectId = mongoose.Schema.Types.ObjectId
 
+const reviewSchema = new mongoose.Schema({
+	userId: {
+		type: ObjectId,
+		ref: "user",
+	},
+	content: String,
+	rating: Number,
+});
+
 
 //sku: categoryCode-..size:s,m,l..||35-50-color:hexString- sequence:...
 
@@ -12,6 +21,13 @@ const schema = new mongoose.Schema({
     index:{unique:true}
   },
   sizes: {},
+  reviews: {
+		reviews: [reviewSchema],
+		rating: {
+			type: Number,
+			default: 0,
+		},
+	},
   discount: {
     type: Number,
     default:0

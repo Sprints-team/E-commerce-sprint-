@@ -1,11 +1,10 @@
 const { default: mongoose } = require("mongoose");
 const BadRequest = require("../errors/bad-request");
-const NotFound = require("../errors/not-found");
 const Product = require("../model/product");
 const ObjectId = mongoose.Types.ObjectId;
-const deleteImage = require("../helpers/deleteImages");
 const { deleteHandlerCreator } = require("../helpers/controller-creators");
 const getColorImages = require("../helpers/ge-color-Images");
+const SKU = require("../model/sku");
 
 /* data received:
       1-the new product data  
@@ -29,11 +28,7 @@ exports.addProduct = async (req, res, next) => {
 		ageGroup,
 	} = req.body;
 
-	// console.log(req.files,"files")
 	const images = getColorImages(req.files);
-	// const images = req.files.map((ele) => {
-	// 	return `uploudes/${ele.filename}`;
-	// });
 
 	const product = new Product({
 		price: +price,
@@ -67,21 +62,61 @@ exports.deleteProduct = deleteHandlerCreator(Product, "product", (doc) => {
 exports.getProduct = async (req, res, next) => {
 	//get all the product data
 	const id = req.params.id;
-	try {
-		let query = Product.findOne()
-			.where("_id")
-			.equals(id)
-			.populate("category", "title")
-			.populate("brand", "title")
-			.populate("skus")
-			.select("-colors");
+	const pipeline = [
+		{
+			$match: {
+				_id: new ObjectId(id),
+			},
+		},
+		{
+			$lookup: {
+				from: "products",
+				localField: "productId",
+				foreignField: "_id",
+				as: "product",
+				pipeline: [
+					{
+						$lookup: {
+							from: "categories",
+							localField: "category",
+							foreignField: "_id",
+							as: "category",
+						},
+					},
+					{
+						$lookup: {
+							from: "brands",
+							localField: "brand",
+							foreignField: "_id",
+							as: "brand",
+						},
+					},
+					{
+						$unwind:"$category"
+					},
+					{
+						$unwind:"$brand"
+					},
+				],
+			},
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [{ $arrayElemAt: ["$product", 0] }, "$$ROOT"],
+				},
+			},
+		},
+		{ $project: { product: 0 } },
+	];
 
-		const product = await query.exec();
-		if (!product) {
+	try {
+		const product = await SKU.aggregate(pipeline);
+		if (!product[0]) {
 			const err = new BadRequest("there is no product with that id");
 			return next(err, req, res, next);
 		}
-		return res.status(200).json(product);
+		return res.status(200).json(product[0]);
 	} catch (err) {
 		next(err, req, res, next);
 	}
@@ -229,3 +264,10 @@ exports.getProducts = async (req, res, next) => {
 		next(err, req, res, next);
 	}
 };
+
+
+
+
+
+
+

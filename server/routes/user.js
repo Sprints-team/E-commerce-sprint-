@@ -5,11 +5,13 @@ const validator = require("../middleware/validators/validator-middleware");
 const secret=process.env.SECTRET_STRING
 const router = express.Router()
 //validation schemas
-const orderSchmea=require("../ajv/validator-schemas/order")
+const orderSchmea = require("../ajv/validator-schemas/order")
+const getOrdersSchema= require("../ajv/validator-schemas/get-order")
+
 
 // routes ,validate(orderSchmea)
-router.post("/order", checkIfUser(secret), order)
-router.get("/orders", checkIfUser(secret), getOrders)
+router.post("/order",validator(orderSchmea), checkIfUser(secret), order)
+router.get("/orders",validator(getOrdersSchema), checkIfUser(secret), getOrders)
 router.put("/order",checkIfUser(secret),cancelOrder)
 
 
