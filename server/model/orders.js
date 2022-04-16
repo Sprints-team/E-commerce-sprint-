@@ -157,7 +157,6 @@ orderSchema.statics.cancelOrder = async function (id, user) {
 	];
 	order.status.message = "user canceled order";
 
-
 	await Promise.all([...promises, order.save()]);
 	return {
 		status: 200,
@@ -186,16 +185,19 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 		let totalPrice = 0;
 		const skus = await SKU.find()
 			.or(or)
-			.select(["sku", "sizes", "price", "discount"]);
+			.select(["sku", "sizes", "price", "discount", "productId"])
+			.populate("productId", "discount");
+		console.log(skus);
 
 		skus.forEach((prod) => {
 			if (
 				productObj[prod._id].qty <= prod.sizes[productObj[prod._id].size].qty
 			) {
 				// this.products[prod.sku].price = prod.price
+				// console.log(productObj[prod._id].qty * prod.price)
 				totalPrice +=
 					productObj[prod._id].qty * prod.price -
-					productObj[prod._id].qty * prod.price * (prod.discount / 100);
+					productObj[prod._id].qty * prod.price * ((prod.productId?.discount/ 100)||0);
 				productObj[prod._id].sku = prod.sku;
 				return;
 			}
@@ -213,13 +215,14 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 							{
 								$inc: {
 									[updateField]: -productObj[_id].qty,
+									soldItems: productObj[_id].qty,
 								},
 							}
 						)
 					);
 				}
 				this.totalPrice = totalPrice;
-				this.status.statusTimeStamp = [new Date()];
+				this.status.statusTimeStamp = [[new Date(),"PROCESSING"]];
 				await Promise.all([...promises, this.save()]);
 			});
 		}

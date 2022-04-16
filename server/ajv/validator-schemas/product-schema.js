@@ -33,7 +33,7 @@ const productSchema = {
 		},
 		gender: {
 			type: "string",
-			enum: ["MALE", "FEMALE"],
+			enum: ["MALE", "FEMALE","UNISEX","unisex","male","female"],
 		},
 		ageGroup: {
 			type: "string",

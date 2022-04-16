@@ -92,10 +92,10 @@ exports.getProduct = async (req, res, next) => {
 						},
 					},
 					{
-						$unwind:"$category"
+						$unwind: "$category",
 					},
 					{
-						$unwind:"$brand"
+						$unwind: "$brand",
 					},
 				],
 			},
@@ -265,9 +265,54 @@ exports.getProducts = async (req, res, next) => {
 	}
 };
 
+// [
+// 	{
+// 		skuId,
+// 		size,
+// 		qty,
+// 	},
+// ];
 
+exports.updateProduct = async (req, res, next) => {
+	const newPrice = req.body.price || req.query.price;
+	const newDiscount = req.body.discount || req.query.discount;
+	const newStock = req.body.stock;
+	const productId = req.params.id;
+	console.log("upthere");
 
+	const updateProductQuery = Product.updateOne().where("_id").equals(productId);
 
-
-
-
+	if (newPrice) updateProductQuery.set("price", newPrice);
+	if (newDiscount) updateProductQuery	.set("discount", newDiscount);
+	if (newStock) {
+		const stockUpdates = {};
+		console.log("downherer");
+		newStock.forEach((prod) => {
+			const qtyField = `sizes.${prod.size}.qty`;
+			if (stockUpdates[prod.skuId]) {
+				stockUpdates[prod.skuId] = stockUpdates[prod.skuId]
+					.where(qtyField)
+					.equals({ $exists: true })
+					.set(qtyField, prod.qty);
+				console.log(prod.qty);
+			} else {
+				stockUpdates[prod.skuId] = SKU.updateOne()
+					.where("_id")
+					.equals(prod.skuId)
+					.where(qtyField)
+					.equals({ $exists: true })
+					.set(qtyField, prod.qty);
+			}
+		});
+		try {
+			
+			const results = await Promise.all([
+				...Object.values(stockUpdates),
+				updateProductQuery
+			]);
+			return res.status(200).json({msg:"updated successfully"});
+		} catch (err) {
+			next(err,req,res,next)
+		}
+	}
+};

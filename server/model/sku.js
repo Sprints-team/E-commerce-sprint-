@@ -21,17 +21,6 @@ const schema = new mongoose.Schema({
     index:{unique:true}
   },
   sizes: {},
-  reviews: {
-		reviews: [reviewSchema],
-		rating: {
-			type: Number,
-			default: 0,
-		},
-	},
-  discount: {
-    type: Number,
-    default:0
-  },
   images: [String],
   price: {
     type: Number,
@@ -49,7 +38,7 @@ const schema = new mongoose.Schema({
 })
 
 
-//middleware
+// middleware
 schema.pre("save", async function (next) {
  try{ const index = await Index.autoIncrement()
   this.sku = `${this.sku}${index}`

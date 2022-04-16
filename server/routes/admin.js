@@ -21,30 +21,28 @@ const fileExtensionValidator = require("../middleware/validators/file-extension-
 // middlewares
 const parseJson = require("../middleware/parsing-middlewares/jsonParse");
 
-//ejv schemas
+//ajv schemas
 const producCompiledSchema = require("../ajv/validator-schemas/product-schema");
 const objectIdCompiledSchema = require("../ajv/validator-schemas/ObjectIdSchema");
 const categoryCompiledSchema = require("../ajv/validator-schemas/category-schema");
 const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
 const orderStatus = require("../ajv/validator-schemas/order-status");
-const getOrderSchem= require("../ajv/validator-schemas/get-order")
+const getOrderSchem = require("../ajv/validator-schemas/get-order");
+const updateProductSchema = require("../ajv/validator-schemas/update-product");
 //controllers
-const {addProduct,deleteProduct}=require("../controllers/product")
+const {
+	addProduct,
+	deleteProduct,
+	updateProduct,
+} = require("../controllers/product");
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
 const { updateOrderStatus, getOrders } = require("../controllers/order");
 
-
-
 // router
 
-
-
-
 //get
-router.get("/orders", validator(getOrderSchem), getOrders)
-
-
+router.get("/orders", validator(getOrderSchem), getOrders);
 
 //post
 router.post(
@@ -62,7 +60,7 @@ router.post(
 	upload.single("image"),
 	fileExtensionValidator,
 	validator(categoryCompiledSchema),
-    addCategory
+	addCategory
 );
 
 //form data
@@ -71,20 +69,19 @@ router.post(
 	upload.single("image"),
 	fileExtensionValidator,
 	validator(brandCompiledSchema),
-    addBrand
+	addBrand
 );
 
 //put
-router.put("/order",validator(orderStatus),updateOrderStatus)
-
-
+router.put("/order", validator(orderStatus), updateOrderStatus);
+router.put("/product/:id", validator(updateProductSchema), updateProduct);
 
 //delete
 
 router.delete(
 	"/product/:id",
 	validator(objectIdCompiledSchema, true),
-    deleteProduct
+	deleteProduct
 );
 
 router.delete(
@@ -98,6 +95,5 @@ router.delete(
 	validator(objectIdCompiledSchema, true),
 	deleteBrand
 );
-
 
 module.exports = router;

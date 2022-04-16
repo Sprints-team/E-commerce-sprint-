@@ -5,7 +5,6 @@ const NotFound = require("../errors/not-found");
 const Brand = require("./brands");
 const Category = require("./category");
 const SKU = require("./sku");
-const Index = require("./sku-index");
 
 // schemas
 const reviewSchema = new mongoose.Schema({
@@ -24,7 +23,7 @@ const productSchema = new mongoose.Schema({
 	},
 	gender: {
 		type: String,
-		enum: ["MALE", "FEMALE"],
+		enum: ["MALE", "FEMALE", "UNISEX"],
 		required: true,
 	},
 	ageGroup: {
@@ -113,7 +112,6 @@ productSchema.methods.addProduct = async function () {
 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
 		if (errMsg) throw new BadRequest(errMsg);
 
-		let index = await Index.autoIncrement();
 		const skus = [];
 		const promises = [];
 		for (let ele in stock) {
@@ -127,16 +125,7 @@ productSchema.methods.addProduct = async function () {
 			// await sku.save();
 			promises.push(sku.save());
 			skus.push(sku._id);
-			index += 1;
 		}
-		Index.updateOne(
-			{ ref: "sku" },
-			{
-				$set: {
-					index: index,
-				},
-			}
-		).exec();
 		this.images = undefined;
 		this.stock = undefined;
 		this.colors = undefined;
@@ -144,7 +133,7 @@ productSchema.methods.addProduct = async function () {
 		this.skus = skus;
 		const save = this.save();
 		const result = await Promise.all([...promises, save]);
-		console.log(result);
+
 		return {
 			saved: true,
 		};
@@ -156,6 +145,18 @@ productSchema.methods.addProduct = async function () {
 //the Model
 
 // middlewares
+productSchema.pre("remove", async function (next) {
+	try {
+		await SKU.deleteMany({
+			_id: {
+				$in: [...this.skus],
+			},
+		});
+		next();
+	} catch (err) {
+		next(err);
+	}
+});
 
 const Product = mongoose.model("product", productSchema);
 
