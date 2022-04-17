@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken")
 
 const User = require("../model/user")
 
+const BadRequest=require("../errors/bad-request")
+
 const secret=process.env.SECTRET_STRING
 
 
@@ -20,6 +22,9 @@ exports.PostSignUp = async(req, res,next) => {
         await user.save()
         return res.status(200).json({msg:"user signed up successfuly successfully"})
     } catch (err) {
+        if (err.code && err.code === 11000) {
+            return next(new BadRequest(`there is an acount with that title already exists`), req, res, next);
+          }
         next(err,req,res,next)
     }
 }

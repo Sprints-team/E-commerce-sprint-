@@ -1,6 +1,9 @@
 const Ajv = require("ajv")
 const addFormats = require("ajv-formats")
-const ajvInstance= new Ajv({allErrors:true})
+const ajvInstance = new Ajv({
+    allErrors: true,
+    coerceTypes: true
+})
 addFormats(ajvInstance)
 
 const strongPassword = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")

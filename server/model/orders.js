@@ -1,31 +1,7 @@
 const mongoose = require("mongoose");
 const SKU = require("./sku");
+const User = require("./user");
 const ObjectId = mongoose.Schema.Types.ObjectId;
-
-//schemas
-// const productInOrderSchema = new mongoose.Schema({
-//     title: {
-//         type: String,
-//         required:true
-//     },
-//     imageUrl: {
-//         type: String,
-//         required: true,
-//     },
-//     price: {
-//         itemPrice: { type: Number, required: true },
-//         qty: {type:Number, required:true}
-//     },
-//     totalPrice: {
-//         type: Number,
-//         required:true
-//     },
-//     productId: {
-//         type:ObjectId,
-//         required:true
-//     }
-
-// },{_id:false})
 
 const orderSchema = new mongoose.Schema({
 	userId: {
@@ -193,11 +169,11 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 			if (
 				productObj[prod._id].qty <= prod.sizes[productObj[prod._id].size].qty
 			) {
-				// this.products[prod.sku].price = prod.price
-				// console.log(productObj[prod._id].qty * prod.price)
 				totalPrice +=
 					productObj[prod._id].qty * prod.price -
-					productObj[prod._id].qty * prod.price * ((prod.productId?.discount/ 100)||0);
+					productObj[prod._id].qty *
+						prod.price *
+						(prod.productId?.discount / 100 || 0);
 				productObj[prod._id].sku = prod.sku;
 				return;
 			}
@@ -222,11 +198,18 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 					);
 				}
 				this.totalPrice = totalPrice;
-				this.status.statusTimeStamp = [[new Date(),"PROCESSING"]];
-				await Promise.all([...promises, this.save()]);
+				const addorderToUser = User.updateOne(
+					{ _id: this.userId },
+					{
+						$push: {
+							orders: this._id,
+						},
+					}
+				);
+				this.status.statusTimeStamp = [[new Date(), "PROCESSING"]];
+				await Promise.all([...promises, this.save(), addorderToUser]);
 			});
 		}
-		// return totalPrice.toString()
 		if (enoughStore)
 			return {
 				placed: true,

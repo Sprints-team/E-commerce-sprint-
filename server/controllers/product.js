@@ -59,6 +59,8 @@ exports.deleteProduct = deleteHandlerCreator(Product, "product", (doc) => {
 });
 
 // get
+
+// get with skuid
 exports.getProduct = async (req, res, next) => {
 	//get all the product data
 	const id = req.params.id;
@@ -112,6 +114,7 @@ exports.getProduct = async (req, res, next) => {
 
 	try {
 		const product = await SKU.aggregate(pipeline);
+		console.log(product)
 		if (!product[0]) {
 			const err = new BadRequest("there is no product with that id");
 			return next(err, req, res, next);

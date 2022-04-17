@@ -121,6 +121,7 @@ productSchema.methods.addProduct = async function () {
 				images: this.images[ele],
 				price: this.price,
 				productId: this._id,
+				title:this.title
 			});
 			// await sku.save();
 			promises.push(sku.save());

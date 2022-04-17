@@ -29,6 +29,8 @@ const brandCompiledSchema = require("../ajv/validator-schemas/brand-schema");
 const orderStatus = require("../ajv/validator-schemas/order-status");
 const getOrderSchem = require("../ajv/validator-schemas/get-order");
 const updateProductSchema = require("../ajv/validator-schemas/update-product");
+const getUsersSchema = require("../ajv/validator-schemas/get-users");
+
 //controllers
 const {
 	addProduct,
@@ -38,11 +40,13 @@ const {
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
 const { updateOrderStatus, getOrders } = require("../controllers/order");
+const { getUsers } = require("../controllers/user");
 
 // router
 
 //get
 router.get("/orders", validator(getOrderSchem), getOrders);
+router.get("/users",validator(getUsersSchema),getUsers);
 
 //post
 router.post(
@@ -57,7 +61,7 @@ router.post(
 // form data
 router.post(
 	"/category",
-	upload.single("image"),
+	upload.single("category"),
 	fileExtensionValidator,
 	validator(categoryCompiledSchema),
 	addCategory
@@ -66,7 +70,7 @@ router.post(
 //form data
 router.post(
 	"/brand",
-	upload.single("image"),
+	upload.single("brand"),
 	fileExtensionValidator,
 	validator(brandCompiledSchema),
 	addBrand
@@ -75,7 +79,7 @@ router.post(
 //put
 router.put("/order", validator(orderStatus), updateOrderStatus);
 router.put("/product/:id", validator(updateProductSchema), updateProduct);
-
+router.put("user");
 //delete
 
 router.delete(

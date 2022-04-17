@@ -15,6 +15,9 @@ const reviewSchema = new mongoose.Schema({
 //sku: categoryCode-..size:s,m,l..||35-50-color:hexString- sequence:...
 
 const schema = new mongoose.Schema({
+  title: {
+    type:String
+  },
   sku: {
     type: String,
     required: true,

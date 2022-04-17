@@ -4,7 +4,8 @@ const { deleteHandlerCreator } = require("../helpers/controller-creators");
 
 
 exports.addCategory=async (req, res, next) => {
-  image = `uploudes/${req.file.filename}`;
+  const image = `uploudes/${req.file.filename}`;
+  console.log(image)
   req.body.gender = req.body.gender.toUpperCase()
   const {title,describtion,gender,abrv}=req.body
   const category = new Category({
