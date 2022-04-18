@@ -13,6 +13,7 @@ const orderSchmea = require("../ajv/validator-schemas/order")
 const getOrdersSchema= require("../ajv/validator-schemas/get-order");
 const statuschmea= require("../ajv/validator-schemas/status");
 const ObjectIdSchema = require("../ajv/validator-schemas/ObjectIdSchema");
+const { addReview } = require("../controllers/product");
 
 
 
@@ -21,7 +22,8 @@ const ObjectIdSchema = require("../ajv/validator-schemas/ObjectIdSchema");
 router.post("/order",validator(orderSchmea), checkIfUser(secret), order)
 router.get("/orders",validator(getOrdersSchema), checkIfUser(secret), getOrders)
 router.put("/order", validator(ObjectIdSchema),checkIfUser(secret), cancelOrder)
-router.put("/deactivate",checkIfUser(secret),updateStatus("INACTIVE_ACOUNT"))
+router.put("/deactivate", checkIfUser(secret), updateStatus("INACTIVE_ACOUNT"))
+router.post("/review",checkIfUser(secret),addReview)
 
 
 

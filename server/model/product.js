@@ -8,12 +8,24 @@ const SKU = require("./sku");
 
 // schemas
 const reviewSchema = new mongoose.Schema({
-	userId: {
-		type: ObjectId,
-		ref: "user",
+	user: {
+		userName: {
+			first: {
+				type:String
+			},
+			last: {
+				type:String
+			},
+			id:String
+		},
+		// will add image
 	},
 	content: String,
-	rating: Number,
+	rating: {
+		type: Number,
+		min: 0,
+		max: 5
+	},
 });
 
 const productSchema = new mongoose.Schema({

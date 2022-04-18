@@ -94,11 +94,24 @@ exports.getProduct = async (req, res, next) => {
 						},
 					},
 					{
+						$lookup: {
+							from: "skus",
+							localField: "skus",
+							foreignField: "_id",
+							as: "colors"
+						}
+					},
+					{
 						$unwind: "$category",
 					},
 					{
 						$unwind: "$brand",
 					},
+					{
+						$project: {
+							"skus":0
+						}
+					}
 				],
 			},
 		},
@@ -114,7 +127,7 @@ exports.getProduct = async (req, res, next) => {
 
 	try {
 		const product = await SKU.aggregate(pipeline);
-		console.log(product)
+		console.log(product);
 		if (!product[0]) {
 			const err = new BadRequest("there is no product with that id");
 			return next(err, req, res, next);
@@ -286,7 +299,7 @@ exports.updateProduct = async (req, res, next) => {
 	const updateProductQuery = Product.updateOne().where("_id").equals(productId);
 
 	if (newPrice) updateProductQuery.set("price", newPrice);
-	if (newDiscount) updateProductQuery	.set("discount", newDiscount);
+	if (newDiscount) updateProductQuery.set("discount", newDiscount);
 	if (newStock) {
 		const stockUpdates = {};
 		console.log("downherer");
@@ -308,14 +321,47 @@ exports.updateProduct = async (req, res, next) => {
 			}
 		});
 		try {
-			
 			const results = await Promise.all([
 				...Object.values(stockUpdates),
-				updateProductQuery
+				updateProductQuery,
 			]);
-			return res.status(200).json({msg:"updated successfully"});
+			return res.status(200).json({ msg: "updated successfully" });
 		} catch (err) {
-			next(err,req,res,next)
+			next(err, req, res, next);
 		}
+	}
+};
+
+exports.addReview = async (req, res, next) => {
+	const { productId, review, rate } = req.body;
+	const userName = req.user.userName;
+
+	console.log(userName, "userName");
+	// return res.send(userName);
+	const newReview = {
+		user: { userName },
+		rating: rate,
+		content: review,
+	};
+
+	try {
+		const product = await Product.findById(productId).select("reviews");
+
+		const reviews = {
+			reviews: [...product.reviews.reviews, newReview],
+			rating:
+				(rate + product.reviews.reviews.length * product.reviews.rating) /
+				(product.reviews.reviews.length + 1),
+		};
+
+		const updatedProduct = await Product.updateOne(
+			{ _id: productId },
+			{ $set: { reviews: reviews } }
+		);
+		if (updatedProduct.modifiedCount === 0)
+			return res.status(403).json({ error: "403", msg: "couldn't add review" });
+		res.status(200).json({ msg: "review added successfully" });
+	} catch (err) {
+		next(err, req, res, next);
 	}
 };
