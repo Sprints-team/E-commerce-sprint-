@@ -30,6 +30,7 @@ const orderStatus = require("../ajv/validator-schemas/order-status");
 const getOrderSchem = require("../ajv/validator-schemas/get-order");
 const updateProductSchema = require("../ajv/validator-schemas/update-product");
 const getUsersSchema = require("../ajv/validator-schemas/get-users");
+const statuschmea= require("../ajv/validator-schemas/status")
 
 //controllers
 const {
@@ -40,13 +41,15 @@ const {
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
 const { updateOrderStatus, getOrders } = require("../controllers/order");
-const { getUsers } = require("../controllers/user");
+const { getUsers, updateStatus } = require("../controllers/user");
+const { getStatistics } = require("../controllers/initial-data");
 
 // router
 
 //get
+router.get("/statistics",getStatistics)
 router.get("/orders", validator(getOrderSchem), getOrders);
-router.get("/users",validator(getUsersSchema),getUsers);
+router.get("/users", validator(getUsersSchema), getUsers);
 
 //post
 router.post(
@@ -79,7 +82,9 @@ router.post(
 //put
 router.put("/order", validator(orderStatus), updateOrderStatus);
 router.put("/product/:id", validator(updateProductSchema), updateProduct);
-router.put("user");
+router.put("/user/suspend",validator(statuschmea) ,updateStatus("SUSPENDED"));
+router.put("/user/active", validator(statuschmea),updateStatus("ACTIVE"));
+
 //delete
 
 router.delete(

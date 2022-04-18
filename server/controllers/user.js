@@ -69,3 +69,18 @@ exports.getUsers = async (req, res, next) => {
 		next(err, req, res, next);
 	}
 };
+
+
+exports.updateStatus =(status)=> async(req, res, next) => {
+	const id = req.body.id || req.query.id || req.user.userId
+	try {
+		const result = await User.updateOne({ _id: id }, { status: status })
+	
+	res.send(result)
+} catch (err) {
+	next(err,req,res,next)
+	}
+}
+
+
+

@@ -76,7 +76,7 @@ const productSchema = new mongoose.Schema({
 		type: ObjectId,
 		ref: "brand",
 	},
-});
+},{timestamps:true});
 
 // static methods
 

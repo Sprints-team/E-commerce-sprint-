@@ -16,7 +16,7 @@ const brandSchema = new mongoose.Schema({
         type: "string",
         required: true
     }
-})
+},{timestamps:true})
 
 
 

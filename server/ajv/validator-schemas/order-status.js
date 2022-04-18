@@ -29,7 +29,7 @@ const schema = {
 			type: "string",
 		},
 	},
-	required: ["id", "status", "carrier"],
+	required: ["id", "status"],
 };
 
 module.exports = ajvInstance.compile(schema);

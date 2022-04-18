@@ -38,7 +38,7 @@ const schema = new mongoose.Schema({
     min: 0,
     default:0
   }
-})
+},{timestamps:true})
 
 
 // middleware

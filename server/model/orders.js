@@ -87,7 +87,7 @@ const orderSchema = new mongoose.Schema({
 	totalPrice: {
 		type: Number,
 	},
-});
+},{timestamps:true});
 
 //static methods
 orderSchema.statics.cancelOrder = async function (id, user) {

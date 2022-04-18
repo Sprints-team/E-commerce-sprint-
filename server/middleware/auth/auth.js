@@ -30,7 +30,6 @@ const authorize = (headers,secret) => {
 exports.checkIfAdmin = (secret) => {
 	return (req, res, next) => {
 		const user = authorize(req.headers,secret);
-		console.log(user, "user");
 		if (!user || user.role !== "ADMIN")
 			return res.status(403).json({
 				error: "403",

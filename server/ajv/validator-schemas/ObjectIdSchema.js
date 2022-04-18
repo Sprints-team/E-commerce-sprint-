@@ -1,10 +1,10 @@
-const ajvInstance=require("../ejv-instance")
-
+const ajvInstance = require("../ejv-instance");
 
 const ObjectIdSchema = {
-    type: "string",
-    format:"objectId"
-}
+	type: "object",
+	properties: {
+		id: { type: "string", format: "objectId" },
+	},
+};
 
-
-module.exports=ajvInstance.compile(ObjectIdSchema)
+module.exports = ajvInstance.compile(ObjectIdSchema);
