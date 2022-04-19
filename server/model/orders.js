@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Copoun = require("./copoun");
 const SKU = require("./sku");
 const User = require("./user");
 const ObjectId = mongoose.Schema.Types.ObjectId;
@@ -48,6 +49,7 @@ const orderSchema = new mongoose.Schema(
 				required: true,
 			},
 		},
+		copoun: {},
 		carrier: {
 			// admin when updating the status of the order from processing to with carrier will add the carrier name
 			type: String,
@@ -93,7 +95,7 @@ const orderSchema = new mongoose.Schema(
 );
 
 //static methods
-orderSchema.statics.cancelOrder = async function (id, user,msg) {
+orderSchema.statics.cancelOrder = async function (id, user, msg) {
 	const order = await this.findOne({ _id: id });
 
 	if (!order)
@@ -114,6 +116,12 @@ orderSchema.statics.cancelOrder = async function (id, user,msg) {
 				msg: "can't cancel order after it got out with carrier",
 			};
 	}
+	if (order.status.currentStatus === "CANCELED") {
+		return {
+			status: 403,
+			msg: "can't cancel order that has been already canceled",
+		};
+	}
 	const promises = [];
 	order.products.forEach((prod) => {
 		const updateField = `sizes.${prod.size}.qty`;
@@ -123,8 +131,8 @@ orderSchema.statics.cancelOrder = async function (id, user,msg) {
 				{
 					$inc: {
 						[updateField]: prod.qty,
-						soldItems: -prod.qty
-					}
+						soldItems: -prod.qty,
+					},
 				}
 			)
 		);
@@ -135,7 +143,7 @@ orderSchema.statics.cancelOrder = async function (id, user,msg) {
 		...order.status.statusTimeStamp,
 		[new Date(), "CANCELED"],
 	];
-	order.status.message = msg||"user canceled order";
+	order.status.message = msg || "user canceled order";
 
 	await Promise.all([...promises, order.save()]);
 	return {
@@ -159,7 +167,17 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 		productObj[ele.skuId] = ele;
 	}
 
+	let copoun
 	try {
+		if (this.copoun) {
+			console.log(this.copoun);
+			copoun = await Copoun.findOne({ code: this.copoun });
+
+			if (!copoun)
+				return { placed: false, err: "the coupon you entered isn't valid" };
+			if (copoun.expirationDate < new Date())
+				return { placed: false, err: "the coupon you entered is expired" };
+		}
 		let enoughStore = true;
 
 		let totalPrice = 0;
@@ -167,7 +185,6 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 			.or(or)
 			.select(["sku", "sizes", "price", "discount", "productId"])
 			.populate("productId", "discount");
-		console.log(skus);
 
 		skus.forEach((prod) => {
 			if (
@@ -183,6 +200,14 @@ orderSchema.methods.checkInventoryAndOrder = async function () {
 			}
 			enoughStore = false;
 		});
+		if (copoun) {
+			this.copoun = copoun;
+			if (copoun.percentile) {
+				totalPrice *= (100 - copoun.amount) / 100;
+			} else {
+				totalPrice -= copoun.amount;
+			}
+		}
 		// return
 		if (enoughStore) {
 			await session.withTransaction(async () => {

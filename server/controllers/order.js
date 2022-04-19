@@ -2,9 +2,9 @@ const Order = require("../model/orders");
 
 // products-->{sku:{,size,qty,price}}
 exports.order = async (req, res, next) => {
-	const { products, country, governerate, city, zipCode, adress } = req.body;
+	const { products, country, governerate, city, zipCode, adress,copoun } = req.body;
 	const userId = req.user.userId;
-	console.log(products);
+	console.log(copoun);
 	const order = new Order({
 		userId,
 		products,
@@ -15,19 +15,22 @@ exports.order = async (req, res, next) => {
 			zipCode,
 			adress,
 		},
+		copoun
 	});
 	const response = await order.checkInventoryAndOrder();
 	res.send(response);
 };
 
 exports.getOrders = async (req, res, next) => {
-	const user = req.user;
-	const orderId = req.body.id || req.query.id;
+	const { orderId, skip } = req.body
+	const user=req.user
+	const limit= req.body.limit||20
 	const query = Order.find();
 
 	if (orderId) query.where("_id").equals(orderId);
 
-	const status = (req.body.status || req.query.status)?.toUpperCase();
+
+	const status = (req.body.status)?.toUpperCase();
 	if (status) query.where("status.currentStatus").equals(status);
 
 	if (user.role === "ADMIN") {
@@ -40,6 +43,9 @@ exports.getOrders = async (req, res, next) => {
 
 		query.where("userId").equals(userId);
 	}
+	if (skip) query.skip(skip)
+	query.limit(limit)
+
 	try {
 		const orders = await query
 			.populate("products.skuId", ["images", "price"])

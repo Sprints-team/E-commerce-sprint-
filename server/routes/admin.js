@@ -30,8 +30,9 @@ const orderStatus = require("../ajv/validator-schemas/order-status");
 const getOrderSchem = require("../ajv/validator-schemas/get-order");
 const updateProductSchema = require("../ajv/validator-schemas/update-product");
 const getUsersSchema = require("../ajv/validator-schemas/get-users");
-const statuschmea = require("../ajv/validator-schemas/status")
-const updateStockSchema= require("../ajv/validator-schemas/update-stock")
+const statuschmea = require("../ajv/validator-schemas/status");
+const updateStockSchema = require("../ajv/validator-schemas/update-stock");
+const copounSchema = require("../ajv/validator-schemas/copoun");
 
 //controllers
 const {
@@ -45,13 +46,15 @@ const { addBrand, deleteBrand } = require("../controllers/brand");
 const { updateOrderStatus, getOrders } = require("../controllers/order");
 const { getUsers, updateStatus } = require("../controllers/user");
 const { getStatistics } = require("../controllers/initial-data");
+const { addCoupon, deleteCopoun,getCopouns } = require("../controllers/coupon");
 
 // router
 
 //get
-router.get("/statistics",getStatistics)
+router.get("/statistics", getStatistics);
 router.get("/orders", validator(getOrderSchem), getOrders);
 router.get("/users", validator(getUsersSchema), getUsers);
+router.get("/copouns",getCopouns)
 
 //post
 router.post(
@@ -81,12 +84,14 @@ router.post(
 	addBrand
 );
 
+router.post("/add-copoun", validator(copounSchema), addCoupon);
+
 //put
 router.put("/order", validator(orderStatus), updateOrderStatus);
 router.put("/product/stock", validator(updateStockSchema), updateStock);
 router.put("/product", validator(updateProductSchema), updateProduct);
-router.put("/user/suspend",validator(statuschmea) ,updateStatus("SUSPENDED"));
-router.put("/user/active", validator(statuschmea),updateStatus("ACTIVE"));
+router.put("/user/suspend", validator(statuschmea), updateStatus("SUSPENDED"));
+router.put("/user/active", validator(statuschmea), updateStatus("ACTIVE"));
 
 //delete
 
@@ -106,6 +111,12 @@ router.delete(
 	"/brand/:id",
 	validator(objectIdCompiledSchema, true),
 	deleteBrand
+);
+
+router.delete(
+	"/copoun/:id",
+	validator(objectIdCompiledSchema, true),
+	deleteCopoun
 );
 
 module.exports = router;

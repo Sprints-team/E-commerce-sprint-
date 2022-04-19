@@ -78,7 +78,7 @@ exports.updateStatus =(status)=> async(req, res, next) => {
 	try {
 		const result = await User.updateOne({ _id: id }, { status: status })
 	
-	res.send(result)
+	res.status(200).send({msg:"user status updated successfully"})
 } catch (err) {
 	next(err,req,res,next)
 	}
