@@ -98,8 +98,15 @@ exports.getProduct = async (req, res, next) => {
 							from: "skus",
 							localField: "skus",
 							foreignField: "_id",
-							as: "colors"
-						}
+							as: "colors",
+							pipeline: [
+								{
+									$project: {
+										color: 1,
+									},
+								},
+							],
+						},
 					},
 					{
 						$unwind: "$category",
@@ -109,9 +116,16 @@ exports.getProduct = async (req, res, next) => {
 					},
 					{
 						$project: {
-							"skus":0
-						}
-					}
+							skus: 0,
+						},
+					},
+					{
+						$project: {
+							category: 1,
+							brand: 1,
+							colors: 1,
+						},
+					},
 				],
 			},
 		},
@@ -151,16 +165,24 @@ exports.getProducts = async (req, res, next) => {
 		sort,
 		skip,
 		limit,
+		bestSeller,
 	} = req.body;
 	//
 	//1->match 2-->lookup || project
 	let pipeline = [
 		{
 			$lookup: {
-				from: "skus",
-				localField: "skus",
+				from: "products",
+				localField: "productId",
 				foreignField: "_id",
-				as: "skus",
+				as: "product",
+				pipeline: [
+					{
+						$project: {
+							skus: 1,
+						},
+					},
+				],
 			},
 		},
 		{
@@ -169,8 +191,11 @@ exports.getProducts = async (req, res, next) => {
 				price: 1,
 				images: 1,
 				ageGroup: 1,
+				sku: 1,
 				rate: "$reviews.rating",
-				skus: 1,
+				product: 1,
+				color: 1,
+				soldItems: 1,
 			},
 		},
 	];
@@ -180,9 +205,18 @@ exports.getProducts = async (req, res, next) => {
 	if (title)
 		matchArr.push({
 			$match: {
-				title: {
-					$regex: `.*${title}.*`,
-				},
+				$or: [
+					{
+						title: {
+							$regex: `.*${title}.*`,
+						},
+					},
+					{
+						sku: {
+							$regex: `.*${title}.*`,
+						},
+					},
+				],
 			},
 		});
 
@@ -234,35 +268,44 @@ exports.getProducts = async (req, res, next) => {
 			});
 		}
 	}
-	if (!sort)
+	if (bestSeller) {
 		sortArr.unshift({
 			$sort: {
-				createdAt: -1,
+				soldItems: -1,
 			},
 		});
+	}
 	if (brand)
 		matchArr.push({
 			$match: {
-				brand: new ObjectId(brand),
+				sku: {
+					$regex: `.*${brand}.*`,
+				},
 			},
 		});
 
 	if (gender)
 		matchArr.push({
 			$match: {
-				gender: gender,
+				sku: {
+					$regex: `.*${gender}.*`,
+				},
 			},
 		});
 	if (ageGroup)
 		matchArr.push({
 			$match: {
-				ageGroup: ageGroup,
+				sku: {
+					$regex: `.*${ageGroup}.*`,
+				},
 			},
 		});
 	if (category)
 		matchArr.push({
 			$match: {
-				category: new ObjectId(category),
+				sku: {
+					$regex: `.*${category}.*`,
+				},
 			},
 		});
 
@@ -274,62 +317,85 @@ exports.getProducts = async (req, res, next) => {
 
 	// return res.send(pipeline);
 	try {
-		const products = await Product.aggregate(pipeline);
+		const products = await SKU.aggregate(pipeline);
 		res.send(products);
 	} catch (err) {
 		next(err, req, res, next);
 	}
 };
 
-// [
-// 	{
-// 		skuId,
-// 		size,
-// 		qty,
-// 	},
-// ];
-
 exports.updateProduct = async (req, res, next) => {
 	const newPrice = req.body.price || req.query.price;
 	const newDiscount = req.body.discount || req.query.discount;
-	const newStock = req.body.stock;
-	const productId = req.params.id;
-	console.log("upthere");
-
-	const updateProductQuery = Product.updateOne().where("_id").equals(productId);
-
-	if (newPrice) updateProductQuery.set("price", newPrice);
-	if (newDiscount) updateProductQuery.set("discount", newDiscount);
-	if (newStock) {
-		const stockUpdates = {};
-		console.log("downherer");
-		newStock.forEach((prod) => {
-			const qtyField = `sizes.${prod.size}.qty`;
-			if (stockUpdates[prod.skuId]) {
-				stockUpdates[prod.skuId] = stockUpdates[prod.skuId]
-					.where(qtyField)
-					.equals({ $exists: true })
-					.set(qtyField, prod.qty);
-				console.log(prod.qty);
-			} else {
-				stockUpdates[prod.skuId] = SKU.updateOne()
-					.where("_id")
-					.equals(prod.skuId)
-					.where(qtyField)
-					.equals({ $exists: true })
-					.set(qtyField, prod.qty);
-			}
-		});
-		try {
-			const results = await Promise.all([
-				...Object.values(stockUpdates),
-				updateProductQuery,
-			]);
-			return res.status(200).json({ msg: "updated successfully" });
-		} catch (err) {
-			next(err, req, res, next);
+	const productId = req.body.id;
+	const single = req.body.single;
+	
+	let updateProductQuery;
+	let updateParentProduct = Promise.resolve();
+	
+	try {
+	if (single) {
+		updateProductQuery = SKU.updateOne().where("_id").equals(productId);
+		if (newPrice) {
+			updateProductQuery.set("price", newPrice);
+		}
+		if (newDiscount) updateProductQuery.set("discount", newDiscount);
+		const result = await updateProductQuery;
+		if (result.modifiedCount === 0) {
+			return res
+			.status(400)
+			.json({ error: "400", msg: "couldn't update product " });
+		}
+	} else {
+		updateProductQuery = SKU.updateMany().where("productId").equals(productId);
+		updateParentProduct = Product.updateOne().where("_id").equals(productId);
+		if (newPrice) {
+			updateProductQuery.set("price", newPrice);
+			updateParentProduct.set("price", newPrice);
+		}
+		if (newDiscount) {
+			updateProductQuery.set("discount", newDiscount);
+			updateParentProduct.set("discount", newDiscount);
+		}
+		const result = await Promise.all([updateParentProduct, updateProductQuery]);
+		if (result[0].modifiedCount === 0 || result[1].modifiedCount === 0) {
+			return res
+				.status(400)
+				.json({ error: "400", msg: "couldn't update product " });
 		}
 	}
+
+		return res.status(200).json({ msg: "updated successfully" });
+	} catch (err) {
+		next(err, req, res, next);
+	}
+};
+
+/* 
+{
+	[{size:XL,qty:3}]
+}
+*/
+exports.updateStock = async (req, res, next) => {
+	const newStock = req.body.newStock;
+	const skuId = req.body.id;
+
+	const updateQuery = SKU.updateOne().where("_id").equals(skuId);
+
+	newStock.forEach((prod) => {
+		const path = `sizes.${prod.size}.qty`;
+		console.log(path)
+		updateQuery.set(path, prod.qty);
+	});
+
+	const result = await updateQuery;
+
+	if (result.modifiedCount === 0) {
+		return res.status(400).json({ error: "400", msg: "couldn't update stock" });
+	}
+	res.status(200).json({
+		msg: "stock updated successfully",
+	});
 };
 
 exports.addReview = async (req, res, next) => {
@@ -345,7 +411,7 @@ exports.addReview = async (req, res, next) => {
 	};
 
 	try {
-		const product = await Product.findById(productId).select("reviews");
+		const product = await SKU.findById(productId).select("reviews");
 
 		const reviews = {
 			reviews: [...product.reviews.reviews, newReview],
@@ -354,7 +420,7 @@ exports.addReview = async (req, res, next) => {
 				(product.reviews.reviews.length + 1),
 		};
 
-		const updatedProduct = await Product.updateOne(
+		const updatedProduct = await SKU.updateOne(
 			{ _id: productId },
 			{ $set: { reviews: reviews } }
 		);

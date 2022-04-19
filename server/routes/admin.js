@@ -30,13 +30,15 @@ const orderStatus = require("../ajv/validator-schemas/order-status");
 const getOrderSchem = require("../ajv/validator-schemas/get-order");
 const updateProductSchema = require("../ajv/validator-schemas/update-product");
 const getUsersSchema = require("../ajv/validator-schemas/get-users");
-const statuschmea= require("../ajv/validator-schemas/status")
+const statuschmea = require("../ajv/validator-schemas/status")
+const updateStockSchema= require("../ajv/validator-schemas/update-stock")
 
 //controllers
 const {
 	addProduct,
 	deleteProduct,
 	updateProduct,
+	updateStock,
 } = require("../controllers/product");
 const { deleteCategory, addCategory } = require("../controllers/category");
 const { addBrand, deleteBrand } = require("../controllers/brand");
@@ -81,7 +83,8 @@ router.post(
 
 //put
 router.put("/order", validator(orderStatus), updateOrderStatus);
-router.put("/product/:id", validator(updateProductSchema), updateProduct);
+router.put("/product/stock", validator(updateProductSchema), updateStock);
+router.put("/product", validator(updateProductSchema), updateProduct);
 router.put("/user/suspend",validator(statuschmea) ,updateStatus("SUSPENDED"));
 router.put("/user/active", validator(statuschmea),updateStatus("ACTIVE"));
 

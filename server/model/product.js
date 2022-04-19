@@ -7,88 +7,58 @@ const Category = require("./category");
 const SKU = require("./sku");
 
 // schemas
-const reviewSchema = new mongoose.Schema({
-	user: {
-		userName: {
-			first: {
-				type:String
-			},
-			last: {
-				type:String
-			},
-			id:String
-		},
-		// will add image
-	},
-	content: String,
-	rating: {
-		type: Number,
-		min: 0,
-		max: 5
-	},
-});
 
-const productSchema = new mongoose.Schema({
-	title: {
-		type: String,
-		required: true,
-	},
-	gender: {
-		type: String,
-		enum: ["MALE", "FEMALE", "UNISEX"],
-		required: true,
-	},
-	ageGroup: {
-		type: String,
-		enum: ["ADULT", "CHILD"],
-	},
-	//--
-	colors: {
-		type: Object,
-	},
-	//--
-	images: {
-		type: Object,
-	},
-	skus: [
-		{
-			type: ObjectId,
-			ref: "sku",
+
+const productSchema = new mongoose.Schema(
+	{
+		title: {
+			type: String,
 			required: true,
 		},
-	],
-	price: {
-		type: Number,
-		required: true,
-		min: 1,
-	},
-	describtion: {
-		type: String,
-		required: true,
-	},
-	// --
-	discount: {
-		type: Number,
-		default: 0,
-		min: 0,
-		max: 99,
-	},
-	reviews: {
-		reviews: [reviewSchema],
-		rating: {
+		gender: {
+			type: String,
+			enum: ["MALE", "FEMALE", "UNISEX"],
+			required: true,
+		},
+		ageGroup: {
+			type: String,
+			enum: ["ADULT", "CHILD"],
+		},
+		//--
+		colors: {
+			type: Object,
+		},
+		//--
+		images: {
+			type: Object,
+		},
+		skus: [
+			{
+				type: ObjectId,
+				ref: "sku",
+				required: true,
+			},
+		],
+		price: {
 			type: Number,
-			default: 0,
+			required: true,
+			min: 1,
+		},
+		describtion: {
+			type: String,
+			required: true,
+		},
+		category: {
+			type: ObjectId,
+			ref: "category",
+		},
+		brand: {
+			type: ObjectId,
+			ref: "brand",
 		},
 	},
-	category: {
-		type: ObjectId,
-		ref: "category",
-	},
-	brand: {
-		type: ObjectId,
-		ref: "brand",
-	},
-},{timestamps:true});
+	{ timestamps: true }
+);
 
 // static methods
 
@@ -112,14 +82,14 @@ productSchema.methods.addProduct = async function () {
 
 	try {
 		// checking if the brand or category exist
-		const catPromise = Category.findOne({ _id: this.category }).select("abrv");
+		const catPromise = Category.findOne({ _id: this.category }).select("title");
 		//passing the abrv to the next middleware
-		const brdPromise = Brand.exists({ _id: this.brand });
+		const brdPromise = Brand.findOne({ _id: this.brand }).select("title");
 		const results = await Promise.all([catPromise, brdPromise]);
 		const [cat, brd] = results;
 		this.abrv = cat.abrv;
 		let errMsg = "";
-		if (cat.length === 0) errMsg += "category doesn't exist";
+		if (!cat) errMsg += "category doesn't exist";
 		if (!brd)
 			errMsg += errMsg ? " and brand doesn't exist" : "brand doesn't exist";
 		if (errMsg) throw new BadRequest(errMsg);
@@ -127,13 +97,17 @@ productSchema.methods.addProduct = async function () {
 		const skus = [];
 		const promises = [];
 		for (let ele in stock) {
+			console.log(ele)
 			const sku = new SKU({
-				sku: `${this.abrv}-${ele.substring(1)}-`,
+				title: this.title,
+				sku: `${cat.title}-${brd.title}-${ele.substring(1)}-${this.gender[0]}-${this.ageGroup[0]}-`,
+				color: ele,
 				sizes: stock[ele],
 				images: this.images[ele],
 				price: this.price,
+				discount: this.discount,
 				productId: this._id,
-				title:this.title
+				title: this.title,
 			});
 			// await sku.save();
 			promises.push(sku.save());

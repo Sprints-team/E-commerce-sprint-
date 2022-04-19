@@ -10,19 +10,17 @@ const getProductsSchema = {
         },
         brand: {
             type: "string",
-            format:"objectId"
         },
         category: {
             type: "string",
-            format:"objectId"
         },
         gender: {
             type: "string",
-            enum:["MALE","FEMALE"]
+            enum:["M","F","U"]
         },
         ageGroup: {
             type: "string",
-            enum:["ADULT","CHILD"]
+            enum:["A","C"]
         },
         price: {
             type: "object",
@@ -53,6 +51,9 @@ const getProductsSchema = {
             type: "number",
             format:"five-star-rating"
         },
+        bestSeller: {
+            type:"boolean"
+        }
     }
 }
 
