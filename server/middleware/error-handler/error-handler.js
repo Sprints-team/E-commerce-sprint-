@@ -27,6 +27,7 @@ const handleValidationError = (err, res) => {
 const authErrorHandler = (err, req, res, next) => {
 	console.log(err);
 	try {
+		if(err.status===404) return res.status(err.status).json({error:"404", msg:err.message})
 		if (err.status === 400)
 			return res.status(err.status).json({ error: 400, msg: err.message });
 		if (err.name === "ValidationError") return handleValidationError(err, res);

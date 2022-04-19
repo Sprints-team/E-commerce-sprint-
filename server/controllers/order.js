@@ -28,7 +28,6 @@ exports.getOrders = async (req, res, next) => {
 	if (orderId) query.where("_id").equals(orderId);
 
 	const status = (req.body.status || req.query.status)?.toUpperCase();
-	console.log(status);
 	if (status) query.where("status.currentStatus").equals(status);
 
 	if (user.role === "ADMIN") {
@@ -52,14 +51,13 @@ exports.getOrders = async (req, res, next) => {
 };
 
 exports.updateOrderStatus = async (req, res, next) => {
-	const status = (req.body.status || req.query.status).toUpperCase();
-	const carrier = req.body.carrier || req.query.carrier;
-	const id = req.body.id || req.query.id;
-	const message = req.body.message || req.query.message;
-
+	const status = req.body.status.toUpperCase();
+	const carrier = req.body.carrier;
+	const id = req.body.id;
+	const message = req.body.message;
 
 	if (status === "CANCELED") {
-		const response = await Order.cancelOrder(id);
+		const response = await Order.cancelOrder(id, null, message);
 		return res.status(response.status).json({ msg: response.msg });
 	}
 	const whereObject = {
@@ -87,8 +85,7 @@ exports.updateOrderStatus = async (req, res, next) => {
 	if (carrier) updateObject.$set.carrier = carrier.toUpperCase();
 	console.log(updateObject);
 	try {
-		console.log(id);
-		const result = await Order.updateOne(whereObject, updateObject,{new:true});
+		const result = await Order.updateOne(whereObject, updateObject);
 		if (result.modifiedCount === 0) {
 			return res.status(400).json({
 				error: 400,
@@ -97,7 +94,6 @@ exports.updateOrderStatus = async (req, res, next) => {
 		}
 		return res.status(200).json({ msg: "order updated successfully" });
 	} catch (err) {
-		console.log(err);
 		next(err, req, res, next);
 	}
 };

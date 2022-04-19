@@ -83,7 +83,7 @@ router.post(
 
 //put
 router.put("/order", validator(orderStatus), updateOrderStatus);
-router.put("/product/stock", validator(updateProductSchema), updateStock);
+router.put("/product/stock", validator(updateStockSchema), updateStock);
 router.put("/product", validator(updateProductSchema), updateProduct);
 router.put("/user/suspend",validator(statuschmea) ,updateStatus("SUSPENDED"));
 router.put("/user/active", validator(statuschmea),updateStatus("ACTIVE"));

@@ -1,12 +1,12 @@
-const BadRequest = require("../errors/bad-request");
+const NotFound = require("../errors/not-found");
 const User = require("../model/user");
 
 exports.getUsers = async (req, res, next) => {
 	const id = (req.query.id || req.body.id)?.trim();
-	const status = (req.query.status || req.body.status)?.trim().toUpperCase();
-	const search = (req.query.search || req.body.search)?.trim();
-	const skip = req.query.skip || req.body.skip;
-	const limit = req.query.limit || req.body.limit || 20;
+	const status = (req.body.status)?.trim().toUpperCase();
+	const search = (req.body.search)?.trim();
+	const skip = req.body.skip;
+	const limit =req.body.limit || 20;
 	try {
 		// if id search find user and return
 		if (id) {
@@ -22,10 +22,9 @@ exports.getUsers = async (req, res, next) => {
 			if (user) {
 				return res.status(200).json([user]);
 			}
-			throw new BadRequest("there is no user with that id");
+			throw new NotFound("there is no user with that id");
 		}
 
-		console.log(typeof skip, typeof limit, "-->numbers????");
 
 		const query = User.find().where("role").equals("USER");
 
@@ -54,8 +53,6 @@ exports.getUsers = async (req, res, next) => {
 				},
 			]);
 
-		console.log(search.split(/ |-/)[1]);
-
 		query.select("-password").populate("orders");
 
 		if (skip) query.skip(skip);
@@ -72,7 +69,12 @@ exports.getUsers = async (req, res, next) => {
 
 
 exports.updateStatus =(status)=> async(req, res, next) => {
-	const id = req.body.id || req.query.id || req.user.userId
+	let id;
+	if (req.user.role === "ADMIN") {
+		id=req.body.id
+	} else {
+		id=req.user.userId
+	}
 	try {
 		const result = await User.updateOne({ _id: id }, { status: status })
 	

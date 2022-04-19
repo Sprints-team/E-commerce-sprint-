@@ -1,3 +1,5 @@
+const Path = require("path")
+const FS=require("fs")
 const mongoose = require("mongoose")
 
 
@@ -18,6 +20,16 @@ const brandSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+//middleWare
+
+brandSchema.pre("remove", async function (next) {
+    const path = Path.join(Path.parse(__dirname).dir, ...this.logo.split("/"))
+    
+    FS.unlink(path, () => {
+        console.log("logo deleted successully")
+    })
+    next()
+})
 
 
 //static methods

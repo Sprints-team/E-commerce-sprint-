@@ -32,14 +32,14 @@ exports.addProduct = async (req, res, next) => {
 
 	const product = new Product({
 		price: +price,
-		title: title,
-		describtion: describtion,
+		title,
+		describtion,
 		discount,
 		gender,
 		ageGroup,
-		colors: colors,
-		category: category,
-		brand: brand,
+		colors,
+		category,
+		brand,
 		images,
 	});
 	try {
@@ -402,8 +402,6 @@ exports.addReview = async (req, res, next) => {
 	const { productId, review, rate } = req.body;
 	const userName = req.user.userName;
 
-	console.log(userName, "userName");
-	// return res.send(userName);
 	const newReview = {
 		user: { userName },
 		rating: rate,

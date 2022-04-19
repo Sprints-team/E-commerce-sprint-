@@ -92,6 +92,10 @@ schema.pre("save", async function (next) {
 	}
 });
 
+schema.pre("remove", function (next) {
+	console.log(__dirname)
+})
+
 const SKU = mongoose.model("sku", schema);
 
 module.exports = SKU;

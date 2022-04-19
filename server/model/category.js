@@ -1,3 +1,5 @@
+const Path = require("path")
+const FS=require("fs")
 const mongoose = require("mongoose");
 
 //schemas
@@ -26,6 +28,15 @@ const categorySchema = new mongoose.Schema({
     }
 },{timestamps:true});
 
+
+//middleware 
+categorySchema.pre("remove", function (next) {
+    
+    const path = Path.join(Path.parse(__dirname).dir, ...this.imgUrl.split("/"))
+    FS.unlink(path, () => {
+        console.log("brand image was removd successfuly")
+    })
+})
 
 //static methods
 

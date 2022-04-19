@@ -1,3 +1,5 @@
+const Path = require("path");
+const fs=require("fs")
 const mongoose = require("mongoose");
 const BadRequest = require("../errors/bad-request");
 const ObjectId = mongoose.Schema.Types.ObjectId;
@@ -7,7 +9,6 @@ const Category = require("./category");
 const SKU = require("./sku");
 
 // schemas
-
 
 const productSchema = new mongoose.Schema(
 	{
@@ -97,10 +98,12 @@ productSchema.methods.addProduct = async function () {
 		const skus = [];
 		const promises = [];
 		for (let ele in stock) {
-			console.log(ele)
+			console.log(ele);
 			const sku = new SKU({
 				title: this.title,
-				sku: `${cat.title}-${brd.title}-${ele.substring(1)}-${this.gender[0]}-${this.ageGroup[0]}-`,
+				sku: `${cat.title}-${brd.title}-${ele.substring(1)}-${this.gender[0]}-${
+					this.ageGroup[0]
+				}-`,
 				color: ele,
 				sizes: stock[ele],
 				images: this.images[ele],
@@ -134,10 +137,24 @@ productSchema.methods.addProduct = async function () {
 // middlewares
 productSchema.pre("remove", async function (next) {
 	try {
+		const images = await SKU.find({
+			_id: {
+				$in: [...this.skus],
+			},
+		}).select("images");
+		console.log(images);
 		await SKU.deleteMany({
 			_id: {
 				$in: [...this.skus],
 			},
+		});
+		images.forEach((imagesArr) => {
+			imagesArr.images.forEach((imagePath) => {
+				const path = Path.join(Path.parse(__dirname).dir, ...imagePath.split("/"))
+				fs.unlink(path, () => {
+					console.log("file was deleted successfully")
+				})
+			});
 		});
 		next();
 	} catch (err) {

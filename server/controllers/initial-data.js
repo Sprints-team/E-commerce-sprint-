@@ -81,7 +81,7 @@ exports.getStatistics = async (req, res, next) => {
 			$count: "users",
 		},
 	];
-	const result = await Promise.all([
+try{	const result = await Promise.all([
 		Promise.resolve({ userStatus: await User.aggregate(userPipeLine) }),
 		Promise.resolve({ orderStatus: await Order.aggregate(orderPipeLine) }),
 		Promise.resolve({
@@ -90,6 +90,9 @@ exports.getStatistics = async (req, res, next) => {
 		Promise.resolve({ newCustomersToday: await User.aggregate(newCustommers) }),
 		Promise.resolve({ ordersToday: await Order.aggregate(ordersToday) }),
 	]);
+	res.status(200).send(result);
+} catch(err) {
+		next(err,req,res,next)
+	}
 
-	res.send(result);
 };

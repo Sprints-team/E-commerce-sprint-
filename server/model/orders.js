@@ -3,94 +3,97 @@ const SKU = require("./sku");
 const User = require("./user");
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-const orderSchema = new mongoose.Schema({
-	userId: {
-		type: ObjectId,
-		ref: "user",
-		required: true,
-	},
-	products: [
-		{
-			skuId: {
-				type: ObjectId,
-				ref: "sku",
-				required: true,
-			},
-			qty: {
-				type: Number,
-				min: 1,
-			},
-			size: {
-				type: String,
-			},
-		},
-	],
-	shippingAdress: {
-		country: {
-			type: String,
+const orderSchema = new mongoose.Schema(
+	{
+		userId: {
+			type: ObjectId,
+			ref: "user",
 			required: true,
 		},
-		governerate: {
-			type: String,
-			required: true,
-		},
-		city: {
-			type: String,
-			required: true,
-		},
-		zipCode: {
-			type: Number,
-			required: true,
-		},
-		adress: {
-			type: String,
-			required: true,
-		},
-	},
-	carrier: {
-		// admin when updating the status of the order from processing to with carrier will add the carrier name
-		type: String,
-	},
-	status: {
-		currentStatus: {
-			type: String,
-			enum: [
-				"PROCESSING",
-				"WITH_CARRIER",
-				"ON_THE_WAY",
-				"DELIVERED",
-				"CANCELED",
-			],
-			default: "PROCESSING",
-		},
-		message: {
-			type: String,
-			default: undefined,
-		},
-		statusTimeStamp: [
+		products: [
 			{
-				type: Array,
-				default: [new Date(), "PROCESSING"],
+				skuId: {
+					type: ObjectId,
+					ref: "sku",
+					required: true,
+				},
+				qty: {
+					type: Number,
+					min: 1,
+				},
+				size: {
+					type: String,
+				},
 			},
 		],
-	},
-	deliveryTime: {
-		expected: {
-			type: Date,
-			required: true,
-			default: new Date(+Date.now() + 4 * 24 * 60 * 60 * 1000),
+		shippingAdress: {
+			country: {
+				type: String,
+				required: true,
+			},
+			governerate: {
+				type: String,
+				required: true,
+			},
+			city: {
+				type: String,
+				required: true,
+			},
+			zipCode: {
+				type: Number,
+				required: true,
+			},
+			adress: {
+				type: String,
+				required: true,
+			},
 		},
-		deliveredAt: {
-			type: Date,
+		carrier: {
+			// admin when updating the status of the order from processing to with carrier will add the carrier name
+			type: String,
+		},
+		status: {
+			currentStatus: {
+				type: String,
+				enum: [
+					"PROCESSING",
+					"WITH_CARRIER",
+					"ON_THE_WAY",
+					"DELIVERED",
+					"CANCELED",
+				],
+				default: "PROCESSING",
+			},
+			message: {
+				type: String,
+				default: undefined,
+			},
+			statusTimeStamp: [
+				{
+					type: Array,
+					default: [new Date(), "PROCESSING"],
+				},
+			],
+		},
+		deliveryTime: {
+			expected: {
+				type: Date,
+				required: true,
+				default: new Date(+Date.now() + 4 * 24 * 60 * 60 * 1000),
+			},
+			deliveredAt: {
+				type: Date,
+			},
+		},
+		totalPrice: {
+			type: Number,
 		},
 	},
-	totalPrice: {
-		type: Number,
-	},
-},{timestamps:true});
+	{ timestamps: true }
+);
 
 //static methods
-orderSchema.statics.cancelOrder = async function (id, user) {
+orderSchema.statics.cancelOrder = async function (id, user,msg) {
 	const order = await this.findOne({ _id: id });
 
 	if (!order)
@@ -120,7 +123,8 @@ orderSchema.statics.cancelOrder = async function (id, user) {
 				{
 					$inc: {
 						[updateField]: prod.qty,
-					},
+						soldItems: -prod.qty
+					}
 				}
 			)
 		);
@@ -131,7 +135,7 @@ orderSchema.statics.cancelOrder = async function (id, user) {
 		...order.status.statusTimeStamp,
 		[new Date(), "CANCELED"],
 	];
-	order.status.message = "user canceled order";
+	order.status.message = msg||"user canceled order";
 
 	await Promise.all([...promises, order.save()]);
 	return {
